@@ -1,0 +1,44 @@
+#ifndef _FD_TYPES_H
+#define _FD_TYPES_H
+
+
+typedef struct {int x; int y; } __int2;
+typedef struct {float x; float y; } __float2;
+
+typedef struct _food_pose_t{
+	char* food_name;
+	__int2 food_pose;
+	__int2 projected_food_pose;
+} food_pose_t;
+
+typedef struct _fd_result_t{
+	int frame_id;
+	double timestamp;
+	int num_fooditems;
+	food_pose_t food_poses[10];
+} fd_result_t;
+
+
+typedef enum _fd_status{
+	fd_success = 0,
+	fd_failed,
+	fd_notimplemented,
+	fd_notinitialized,
+	fd_invalidargs,
+	fd_accessviolation
+} fd_status;
+
+typedef enum _buffer_format{
+	rgb_uint8 = 0,
+	rgb_float32,
+	rgb_float64,
+} buffer_format;
+
+typedef struct _fd_config_t{
+	int height;
+	int width;
+	buffer_format format;
+} fd_config_t;
+
+#endif
+
