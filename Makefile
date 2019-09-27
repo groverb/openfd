@@ -1,9 +1,21 @@
-home = `pwd`
+home = $(shell pwd)
+os = $(shell uname)
 
-cc = gcc
-cflags = -g
+
+ifeq ($(os), Darwin)
+	cc = clang
+endif
+
+ifeq ($(os), Linux)
+		cc = gcc
+endif
+
+
+cflags = -g -W
 
 dirs = preprocessor
+
+E = @echo
 
 # includepath = $(foreach dir, $(dirs), -I $(dir) )
 includedir = $(home)/include/
@@ -15,6 +27,6 @@ libopenfd:
 	@echo "target unimplemented"
 
 tests:
+	@echo "building for $(os)"
 	$(cc) $(cflags) -I $(includedir) $(sourcedir)/preprocessor/downsample.c $(sourcedir)/3rdparty/qdbmp.c test.c -o bin/test
-
 		

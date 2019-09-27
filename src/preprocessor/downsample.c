@@ -56,16 +56,16 @@ static uint8_t* downsample(uint8_t (*f)(uint8_t,uint8_t), const uint8_t* ctx, co
 }
 
 uint8_t* downsample_max(const uint8_t* buff, const __int2 indims){
-	downsample(&u8_max, buff, indims);
+	return downsample(&u8_max, buff, indims);
 }
 uint8_t* downsample_min(const uint8_t* buff, const __int2 indims){
-	downsample(&u8_min, buff, indims);
+	return downsample(&u8_min, buff, indims);
 }
 uint8_t* downsample_rand(const uint8_t* buff, const __int2 indims){
-	downsample(&u8_rand, buff, indims);
+	return downsample(&u8_rand, buff, indims);
 }
 uint8_t* downsample_avg(const uint8_t* buff, const __int2 indims){
-	downsample(&u8_avg, buff, indims);
+	return downsample(&u8_avg, buff, indims);
 }
 
 
