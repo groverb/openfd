@@ -4,6 +4,8 @@
 
 typedef struct {int x; int y; } __int2;
 typedef struct {float x; float y; } __float2;
+typedef struct {int x; int y; int z; } __int3;
+typedef struct {float x; float y; float z; } __float3;
 
 typedef struct _food_pose_t{
 	char* food_name;
@@ -20,12 +22,13 @@ typedef struct _fd_result_t{
 
 
 typedef enum _fd_status{
-	fd_success = 0,
+	fd_ok = 0,
 	fd_failed,
 	fd_notimplemented,
 	fd_notinitialized,
 	fd_invalidargs,
-	fd_accessviolation
+	fd_accessviolation,
+	fd_filenotfound
 } fd_status;
 
 typedef enum _buffer_format{
