@@ -1,4 +1,4 @@
-#include <3rdparty/qdbmp.h>
+#include "qdbmp.h"
 #include <stdlib.h>
 #include <string.h>
 
