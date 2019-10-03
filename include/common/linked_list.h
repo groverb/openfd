@@ -14,11 +14,13 @@ typedef struct _node{
 typedef struct _list{
 	node* HEAD;
 	node* TAIL;
+	size_t size;
 } list;
 
 list* make_list(){
 	list* l = malloc(sizeof(list));
 	l->HEAD = l->TAIL = NULL;
+	l->size = 0;
 	return l;
 }
 
@@ -33,6 +35,7 @@ int push_front(list* l, void* val, char type){
 	node* cur_h = l->HEAD;
 	new_node->next = cur_h;
 	l->HEAD = new_node;
+	l->size++;
 	return 1;
 }
 
@@ -42,6 +45,7 @@ int pop_front(list* l){
 	l->HEAD = l->HEAD->next;
 	free(cur_h->val);
 	free(cur_h);
+	l->size--;
 	return 1;
 }
 
@@ -62,6 +66,7 @@ int __push_back(list* l, void* val, char type){
 		}
 		cur->next = new_node;
 		l->TAIL = new_node;
+		l->size++;
 		return 1;
 	}
 	return 0;
@@ -78,6 +83,7 @@ int push_back(list* l, void* val, char type){
 		new_node->prev = l->TAIL;
 		l->TAIL->next = new_node;
 		l->TAIL = l->TAIL->next;
+		l->size++;
 		return 1;
 	}
 
@@ -96,6 +102,7 @@ int __pop_back(list* l){
 		free(cur_n->val);
 		free(cur_n);
 		cur->next = NULL;
+		l->size--;
 		return 1;
 	}
 	return 0;
@@ -114,6 +121,7 @@ int pop_back(list* l){
 		free(tbf);
 
 		l->TAIL->next = NULL;
+		l->size--;
 		return 1;
 	}
 	return 0;
@@ -143,12 +151,7 @@ node* get(list* l, int index){
 }
 
 size_t size(list* l){
-	if(l->HEAD == NULL) { return 0; }
-	if(l->HEAD->next == NULL) { return 1; }
-	size_t sz = 0;
-	node* cur = l->HEAD;
-	while(cur !=NULL){ sz++; cur = cur->next; }
-	return sz;
+	return l->size;
 }
 
 
@@ -179,7 +182,7 @@ void print_list(list* l){
 	}
 }
 
-void free_list(list* l){
+size_t free_list(list* l){
 	node* temp;
 	while(l->HEAD != NULL){
 		temp = l->HEAD;
@@ -188,8 +191,12 @@ void free_list(list* l){
 		free(temp);
 		temp = NULL;
 	}
+	l->size = 0;
+	int finalsz = l->size;
+	
 	free(l);
 	l = NULL;
+	return finalsz;
 }
 
 #endif // _LINKED_LIST_H
