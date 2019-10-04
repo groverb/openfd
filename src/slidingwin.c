@@ -9,7 +9,7 @@
 #include "qdbmp.h"
 #include "linked_list.h"
 
-#define DBG 0 
+ #define DBG 1
 
 
 static int get_possible_fcount(const __int3* buffdims, const __int3* windims){
@@ -75,19 +75,19 @@ int main(int argc, char** argv){
 
 	__int3 inpdims = {.x = BMP_GetHeight(inp), .y = BMP_GetWidth(inp), .z = 3};
 	printf("inpdims: %d, %d \n", inpdims.x, inpdims.y);
-	__int3 windims = {.x = 400, .y = 400, .z = 3};
+	__int3 windims = {.x = 64, .y = 64, .z = 3};
 
 	__int2 temp_off = {.x = 73728+600, .y = 0};
 	
 	printf("possible f's: %d\n", get_possible_fcount(&inpdims, &windims));
-	list* newf5 = sw_get_frames(inp->Data,  inpdims, windims, 50 );
+	list* newf5 = sw_get_frames(inp->Data,  inpdims, windims, 30 );
 
 #if DBG
 	node* cur = newf5->HEAD;
 	int fc = 0;
 	while(cur != NULL){
 
-		BMP* temp = BMP_Create(400, 400, 24);
+		BMP* temp = BMP_Create(64, 64, 24);
 		free(temp->Data);
 		temp->Data = cur->val;
 		char fname[20];
