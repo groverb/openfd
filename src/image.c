@@ -3,24 +3,14 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "image.h"
+
 #include "fd_types.h"
 #include "qdbmp.h"
 
-#define DBG 1 
 
-typedef struct _pixel{
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-} pixel;
-
-typedef struct _image{
-	__int2 dims;
-	int channel;
-	pixel** data;
-	uint8_t* header;
-} image;
-
+#define DBG 0 
+#define WRITE_BMP 1
 
 static pixel pixel_max(pixel pa, pixel pb){
 	pixel ret;
@@ -64,8 +54,24 @@ image* make_image(__int2 imagedims){
 	return ret;
 }
 
+image* imagecp(image* ctx){
+	image* ret = make_image(ctx->dims);
+	memcpy(ret->data, ctx->data, sizeof(pixel) * ctx->dims.x * ctx->dims.y);
+	return ret;
+}
 
+void imagewrite(image* ctx, const char* fname){
+#ifdef WRITE_BMP
+	BMP* outbmp = BMP_Create(ctx->dims.x, ctx->dims.y, 24);
+	free(outbmp->Data);
+	uint8_t* buff = imgtob(ctx);
+	outbmp->Data = buff;
 
+	BMP_WriteFile(outbmp, fname);
+//	BMP_Free(outbmp);
+#endif
+
+}
 image* btoimg(uint8_t* buff, __int2 imagedims){
 	image* ret = make_image(imagedims);
 	if(ret != NULL){
@@ -119,8 +125,8 @@ image* image_resample(image* ctx, __int2 outdims, pixel (*f)(pixel, pixel)){
 			for(int j=0;j<outdims.x;j++){
 				int pt = (ctx->dims.x * 2) * i + (j * 2);
 
-				pixel cmp =  f(*ctx->data[pt],
-						f( *ctx->data[pt + 1], f(*ctx->data[pt + ctx->dims.x], *ctx->data[pt + ctx->dims.x + 1])));
+				pixel cmp =  f(*(ctx->data[pt]),
+						f( *(ctx->data[pt + 1]), f(*(ctx->data[pt + ctx->dims.x]), *(ctx->data[pt + ctx->dims.x + 1]))));
 
 				memcpy(ret->data[i * outdims.x + j], &cmp, sizeof(pixel));
 

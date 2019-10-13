@@ -127,6 +127,16 @@ int pop_back(list* l){
 	return 0;
 }
 
+void list_foreach(list* l, void (*f)(void*)){
+	if(l != NULL){
+		node* cur = l->HEAD;
+		while(cur != NULL){
+			f(cur);
+			cur = cur->next;
+		}
+	}
+
+}
 void print_ch_list(list* l){
 	if(l != NULL){
 		node* cur = l->HEAD;
