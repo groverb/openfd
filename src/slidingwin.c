@@ -86,7 +86,7 @@ int main(int argc, char** argv){
 
 	image* img1 = btoimg(inp->Data, inpdims); // make_image(inp->Data, inpdims);
 	__int2 offset = {.x = 10, .y = 0};
-	__int2 windims = {200, 200};
+	__int2 windims = {atoi(argv[3]), atoi(argv[3])};
 
 	image* win = create_window(img1, windims, offset);
 
