@@ -157,7 +157,7 @@ node* get(list* l, int index){
 			ind++;
 		}
 	}
-	return cur_n;
+	return NULL;
 }
 
 size_t size(list* l){
