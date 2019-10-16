@@ -3,7 +3,7 @@
 
 #include "fd_types.h"
 
-fd_status fd_init(const char* docpath);
+fd_status fd_init(fd_config_t config);
 
 fd_status fd_configure_input(fd_config_t config);
 

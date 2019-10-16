@@ -17,7 +17,7 @@ static list* _waitq = NULL;
 static list* _doneq = NULL;
 
 
-fd_status init(fd_config_t config){
+fd_status fd_init(fd_config_t config){
 	_waitq = make_list();
 	_doneq = make_list();
 
