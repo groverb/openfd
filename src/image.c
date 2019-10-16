@@ -54,17 +54,17 @@ image* make_image(__int2 imagedims){
 	return ret;
 }
 
-image* imagecp(image* ctx){
+image* image_cp(image* ctx){
 	image* ret = make_image(ctx->dims);
 	memcpy(ret->data, ctx->data, sizeof(pixel) * ctx->dims.x * ctx->dims.y);
 	return ret;
 }
 
-void imagewrite(image* ctx, const char* fname){
+void image_write(image* ctx, const char* fname){
 #ifdef WRITE_BMP
 	BMP* outbmp = BMP_Create(ctx->dims.x, ctx->dims.y, 24);
 	free(outbmp->Data);
-	uint8_t* buff = imgtob(ctx);
+	uint8_t* buff = image_to_buffer(ctx);
 	outbmp->Data = buff;
 
 	BMP_WriteFile(outbmp, fname);
@@ -72,7 +72,7 @@ void imagewrite(image* ctx, const char* fname){
 #endif
 
 }
-image* btoimg(uint8_t* buff, __int2 imagedims){
+image* buffer_to_image(uint8_t* buff, __int2 imagedims){
 	image* ret = make_image(imagedims);
 	if(ret != NULL){
 		printf("not null\n");
@@ -102,7 +102,7 @@ void free_image(image* ctx){
 	}
 }
 
-uint8_t* imgtob(image* ctx){
+uint8_t* image_to_buffer(image* ctx){
 	size_t imgsz = ctx->dims.x * ctx->dims.y;
 	size_t buffsz = imgsz * 3;
 	uint8_t* ret = malloc(sizeof(uint8_t) * buffsz);
@@ -152,14 +152,14 @@ int main(int argc, char** argv){
 	printf("loaded image size: %d %d\n", indims.x, indims.y);
 
 	printf("2\n");
-	image* img1 = btoimg(rd->Data, indims);
+	image* img1 = buffer_to_image(rd->Data, indims);
 
 	printf("2.5\n");
 	__int2 newdims = {indims.x/2, indims.y/2};
 
 	image* newimage = image_resample(img1, newdims, &pixel_max);
 	printf("2.75\n");
-	uint8_t* buff1 = imgtob(newimage);
+	uint8_t* buff1 = image_to_buffer(newimage);
 
 	printf("3\n");
 	BMP* wt = BMP_Create(newdims.x, newdims.y, 24);

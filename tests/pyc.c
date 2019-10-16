@@ -71,16 +71,6 @@ fd_status init_py_bridge(const char* docpath){
 
 int __py_eval(const uint8_t* buff, size_t buff_len){
 	printf("in here\n");
-	/*
-		 setenv("PYTHONPATH",".",1);
-
-		 Py_Initialize();
-		 pName = PyUnicode_DecodeFSDefault("__eval__");
-
-		 pModule = PyImport_Import(pName);
-	// Py_DECREF(pName);
-	 */
-
 	if(pModule != NULL){
 		printf("p mod not null\n");
 		pinit_func = PyObject_GetAttrString(pModule, "py_eval");
@@ -121,7 +111,6 @@ static void free_py_bridge(){
 }
 
 int eval(const uint8_t* buff, size_t buff_len){
-	printf("c eval callled\n");
 	return __py_eval(buff, buff_len);
 }
 

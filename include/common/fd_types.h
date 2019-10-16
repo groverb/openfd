@@ -25,6 +25,7 @@ typedef enum _fd_status{
 	fd_ok = 0,
 	fd_failed,
 	fd_notimplemented,
+	fd_nullptr,
 	fd_notinitialized,
 	fd_invalidargs,
 	fd_accessviolation,
@@ -38,8 +39,7 @@ typedef enum _buffer_format{
 } buffer_format;
 
 typedef struct _fd_config_t{
-	int height;
-	int width;
+	__int2 indims;
 	buffer_format format;
 } fd_config_t;
 

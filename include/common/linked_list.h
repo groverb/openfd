@@ -17,7 +17,7 @@ typedef struct _list{
 	size_t size;
 } list;
 
-list* make_list(){
+ list* make_list(){
 	list* l = malloc(sizeof(list));
 	l->HEAD = l->TAIL = NULL;
 	l->size = 0;
@@ -37,6 +37,10 @@ int push_front(list* l, void* val, char type){
 	l->HEAD = new_node;
 	l->size++;
 	return 1;
+}
+
+const node* list_head(list* l){
+	return l->HEAD;
 }
 
 int pop_front(list* l){

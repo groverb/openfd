@@ -22,7 +22,7 @@ static image* create_window(image* ctx, __int2 windims, __int2 offset){
 			i+=ctx->dims.x){
 
 		for(int j = i; j< i + windims.y; j++){
-		
+
 			ret->data[pt]->r = ctx->data[j]->r;
 			ret->data[pt]->g = ctx->data[j]->g;
 			ret->data[pt]->b = ctx->data[j]->b;
@@ -42,7 +42,7 @@ list* sw_get_frames(image* ctx, __int2 windims, int step){
 	printf("fc: %d\n", fc);
 
 	if(fc == 0){
-		image* ctx_cp = imagecp(ctx);
+		image* ctx_cp = image_cp(ctx);
 		push_back(ret, ctx_cp, 'u');
 	}
 	else{
@@ -51,7 +51,7 @@ list* sw_get_frames(image* ctx, __int2 windims, int step){
 				if(c++ % step == 0){
 					__int2 offset = {.x = i * ctx->dims.x + j, .y = 0 };
 
-				push_back(ret, create_window(ctx, windims, offset), 'u');
+					push_back(ret, create_window(ctx, windims, offset), 'u');
 				}
 			}
 		}
@@ -70,7 +70,7 @@ static void foreach_frame(list* l){
 		while(cur != NULL){
 			char fname[10];
 			sprintf(fname, "%d.bmp", i);
-			imagewrite((image*)(cur->val), fname);
+			image_write((image*)(cur->val), fname);
 			cur = cur->next;
 			i++;
 		}
@@ -84,19 +84,19 @@ int main(int argc, char** argv){
 	BMP* inp = BMP_ReadFile(argv[1]);
 	__int2 inpdims = {.x = BMP_GetWidth(inp), .y = BMP_GetHeight(inp)};
 
-	image* img1 = btoimg(inp->Data, inpdims); // make_image(inp->Data, inpdims);
+	image* img1 = buffer_to_image(inp->Data, inpdims); // make_image(inp->Data, inpdims);
 	__int2 offset = {.x = 10, .y = 0};
 	__int2 windims = {atoi(argv[3]), atoi(argv[3])};
 
 	image* win = create_window(img1, windims, offset);
 
-	imagewrite(win,argv[2]);
+	image_write(win,argv[2]);
 
 	list* frames = sw_get_frames(img1, windims, 30);
 	printf("finished with %ld frames\n", frames->size);
 
 	foreach_frame(frames);
-	
+
 	free_list(frames);
 	free(img1);
 	return 0;

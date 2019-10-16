@@ -26,13 +26,13 @@ image* make_image(__int2 imagedims);
 
 void free_image(image* ctx);
 
-image* imagecp(image* ctx);
+image* image_cp(image* ctx);
 
-void imagewrite(image* ctx, const char* fname);
+void image_write(image* ctx, const char* fname);
 
-image* btoimg(uint8_t* buff, __int2 imagedims);
+image* buffer_to_image(uint8_t* buff, __int2 imagedims);
 
-uint8_t* imgtob(image* ctx);
+uint8_t* image_to_buffer(image* ctx);
 
 image* image_resample(image* ctx, __int2 outdims, pixel (*f)(pixel, pixel));
 
