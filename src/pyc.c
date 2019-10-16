@@ -4,14 +4,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-static PyObject* pName = NULL;
-static PyObject* pModule = NULL;
+static PyObject* pname = NULL;
+static PyObject* pmodule = NULL;
 static PyObject* pmain_func = NULL, *pinit_func = NULL;
-static PyObject* pArgs = NULL;
-static PyObject* pValue = NULL;
+static PyObject* pargs = NULL;
+static PyObject* pvalue = NULL;
 
 static PyObject* atoplist(const uint8_t* buff, size_t buff_len){
-	printf("starting list\n");
 	PyObject* ret_list = PyList_New((int)buff_len);
 	if(ret_list == NULL){ printf("couldnt make list\n"); exit(-1); }
 	for(int i = 0;i< (int)buff_len;i++){
@@ -40,29 +39,26 @@ fd_status init_py_bridge(const char* docpath){
 	setenv("PYTHONPATH",".",1);
 
 	Py_Initialize();
-	pName = PyUnicode_DecodeFSDefault("__eval__");
-	// pName = PyString_FromString("__eval__");
-	/* Error checking of pName left out */
+	pname = PyUnicode_DecodeFSDefault("__eval__");
+	pmodule = PyImport_Import(pname);
+	// Py_DECREF(pname);
 
-	pModule = PyImport_Import(pName);
-	// Py_DECREF(pName);
-
-	if (pModule != NULL) {
-		pinit_func = PyObject_GetAttrString(pModule, "init_py_bridge");
-		// pmain_func = PyObject_GetAttrString(pModule, "py_eval");
+	if (pmodule != NULL) {
+		pinit_func = PyObject_GetAttrString(pmodule, "init_py_bridge");
+		// pmain_func = PyObject_GetAttrString(pmodule, "py_eval");
 		if(pmain_func == NULL){
 			printf("EVAL FUNTION NOT FOUND");
 		}
 
 		// call init_py_bridge
-		pArgs = PyTuple_New(1);
+		pargs = PyTuple_New(1);
 		PyObject* py_docpath = PyUnicode_DecodeFSDefault(docpath);
 		// PyObject* py_docpath = PyString_FromString(docpath);
-		PyTuple_SetItem(pArgs, 0, py_docpath);
+		PyTuple_SetItem(pargs, 0, py_docpath);
 
 
 
-		pValue = PyObject_CallObject(pinit_func, pArgs );
+		pvalue = PyObject_CallObject(pinit_func, pargs );
 
 		return fd_ok;
 	}
@@ -71,30 +67,30 @@ fd_status init_py_bridge(const char* docpath){
 
 int __py_eval(const uint8_t* buff, size_t buff_len){
 	printf("in here\n");
-	if(pModule != NULL){
+	if(pmodule != NULL){
 		printf("p mod not null\n");
-		pinit_func = PyObject_GetAttrString(pModule, "py_eval");
+		pinit_func = PyObject_GetAttrString(pmodule, "py_eval");
 
 
 		if (pinit_func && PyCallable_Check(pinit_func)) {
-			pArgs = PyTuple_New(1);
+			pargs = PyTuple_New(1);
 
-			PyTuple_SetItem(pArgs, 0, atoplist(buff, buff_len));
+			PyTuple_SetItem(pargs, 0, atoplist(buff, buff_len));
 
-			pValue = PyObject_CallObject(pinit_func, pArgs );
+			pvalue = PyObject_CallObject(pinit_func, pargs );
 
-			int ret = (int)PyFloat_AsDouble(pValue);
+			int ret = (int)PyFloat_AsDouble(pvalue);
 			printf("Got back: %d\n", ret);
 			return ret;
 
-			// Py_DECREF(pArgs);
+			// Py_DECREF(pargs);
 		}
 		else {
 			if (PyErr_Occurred())
 				PyErr_Print();
 		}
 		// Py_XDECREF(pmain_func);
-		// Py_DECREF(pModule);
+		// Py_DECREF(pmodule);
 	}
 	else {
 		PyErr_Print();
@@ -104,9 +100,9 @@ int __py_eval(const uint8_t* buff, size_t buff_len){
 }
 
 static void free_py_bridge(){
-	 Py_XDECREF(pmain_func);
-	 Py_XDECREF(pinit_func);
-		Py_DECREF(pModule);
+	Py_XDECREF(pmain_func);
+	Py_XDECREF(pinit_func);
+	Py_DECREF(pmodule);
 	Py_Finalize();
 }
 
@@ -118,7 +114,7 @@ int main(int argc, char *argv[]){
 	BMP* cbmp = BMP_ReadFile(argv[2]);
 
 	assert(init_py_bridge(argv[1]) == fd_ok);
-	int catsz =101;
+	int catsz = 101;
 
 	char* categories[101]; //  = malloc(sizeof(char) * catsz);
 	load_categories(argv[3], categories, catsz);
@@ -128,7 +124,7 @@ int main(int argc, char *argv[]){
 	printf("predicted category: %s\n", categories[eval(cbmp->Data,  64 * 64 * 3)]) ;
 	// atoplist(cbmp->Data, 64 * 64 * 3);
 	printf("done \n");
-	
+
 	for(int i =0;i<catsz; i++){
 		free(categories[i]);
 	}

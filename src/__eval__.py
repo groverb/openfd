@@ -36,31 +36,19 @@ g_initb = False
 
 def py_eval(buff):
 	# import cStringIO
-	print("PGOT CALLED\n")
 	npbuff = np.asarray(buff)
-	print(npbuff.shape)
 	npbuff = npbuff.reshape((64, 64,3))
-	print(npbuff.shape)
-	print("PTRANSPOSE")	
 	# transpoe
 	npbuff = np.flip(npbuff, 2)
 	npbuff = np.flip(npbuff, 0)
-	print(npbuff.shape)
-	print("P AS FLOAT")	
 	npbuff = npbuff.astype(float)/255.
 	npbuff_expanded = np.expand_dims(npbuff, axis = 0)
-	print("PHERE")
 	temp =  pyeval_instance._eval(npbuff_expanded)
-	print("TEMP")
-	print(temp)
 	return temp
 
 
 
 def init_py_bridge(docpath):
-	print("INIT called")
-	print("docpath: ")
-	print(docpath)
 	global pyeval_instance
 	pyeval_instance = __fd_pyeval(docpath)
 	fil = open("blaboc_init.txt", "w")
