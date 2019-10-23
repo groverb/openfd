@@ -17,7 +17,7 @@ typedef struct _fd_result_t{
 	int frame_id;
 	double timestamp;
 	int num_fooditems;
-	food_pose_t food_poses[10];
+	food_pose_t food_pos[10];
 } fd_result_t;
 
 

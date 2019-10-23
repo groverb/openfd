@@ -3,10 +3,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "image.h"
+#include <fd/fd_types.h>
 
-#include "fd_types.h"
+#include "image.h"
 #include "qdbmp.h"
+
 
 
 #define DBG 0 
@@ -137,7 +138,7 @@ image* image_resample(image* ctx, __int2 outdims, pixel (*f)(pixel, pixel)){
 }
 
 
-#if DBG
+#if 0 
 
 int main(int argc, char** argv){
 

@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "fd_types.h"
+#include <fd/fd_types.h>
 #include "qdbmp.h"
 
 

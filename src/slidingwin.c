@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "image.h"
-#include "fd_types.h"
+#include "slidingwin.h"
+
 #include "qdbmp.h"
 #include "linked_list.h"
 
@@ -78,6 +78,7 @@ static void foreach_frame(list* l){
 
 }
 
+#if 0
 // test
 int main(int argc, char** argv){
 
@@ -102,4 +103,5 @@ int main(int argc, char** argv){
 	return 0;
 }
 
+#endif
 
