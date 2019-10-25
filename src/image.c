@@ -80,7 +80,6 @@ image* image_cp(image* ctx){
 	for(int i=0;i< ctx->dims.x * ctx->dims.y; i++){
 		memcpy(ret->data[i], ctx->data[i], sizeof(pixel));;
 	}
-	memcpy(ret->data, ctx->data, sizeof(pixel*));
 	return ret;
 }
 

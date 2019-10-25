@@ -67,14 +67,10 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 		assert(prepare_result(evaluations, result) == fd_ok);
 		
 		free_list(evaluations);
-	 free_image_list(frames);
-		
-		/*node* temp = frames->HEAD;
-		free_image((image*)(temp->val));
-		free(temp);
-		free(frames);
-*/
-//free_image(ctx);
+	//  free_image_list(frames);
+		free_list_custom(frames, &free_image, image);
+
+	free_image(ctx);
 
 		return fd_ok;
 

@@ -11,7 +11,7 @@ ifeq ($(os), Linux)
 endif
 
 
-cflags = -g -W -fPIC
+cflags = -g -Wall -fPIC
 
 dirs = preprocessor
 
