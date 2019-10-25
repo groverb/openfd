@@ -29,6 +29,9 @@ libopenfd:
 	$(cc) -shared *.o -o libopenfd.so
 	rm -rf *.o
 
+maint:
+	$(cc) $(cflags) -Wl,-rpath -Wl,./ test.c src/3rdparty/qdbmp/qdbmp.c -I include/ -L./ -lopenfd -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m -o maintest
+
 clean:
 	rm -rf libopenfd.a
 	rm -rf libopenfd.so

@@ -5,10 +5,11 @@ from io import BytesIO
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
-
 import tensorflow as tf
-import logging
-tf.get_logger().setLevel(logging.ERROR)
+from tensorflow.python.util import deprecation
+
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+deprecation._PRINT_DEPRECATION_WARNINGS = False
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import h5py
 import skimage
@@ -31,29 +32,33 @@ from tensorflow.keras.backend import set_session
 
 g_session = tf.Session()
 g_graph = tf.get_default_graph()
-g_docpath = "../../"
+g_docpath = "../"
 g_initb = False
 
 def py_eval(buff):
+	print("PYTHON: py_eval()")
 	# import cStringIO
+	print(len(buff))
 	npbuff = np.asarray(buff)
 	npbuff = npbuff.reshape((64, 64,3))
 	# transpoe
 	npbuff = np.flip(npbuff, 2)
 	npbuff = np.flip(npbuff, 0)
+	# npbuff = np.flip(npbuff, 1)
+	img = Image.fromarray(npbuff.astype('uint8'), 'RGB')
+	img.save("py_received.png")
 	npbuff = npbuff.astype(float)/255.
 	npbuff_expanded = np.expand_dims(npbuff, axis = 0)
 	temp =  pyeval_instance._eval(npbuff_expanded)
+	print("PYTHON: ")
+	print(temp)
 	return temp
 
 
-
-def init_py_bridge(docpath):
+def init_py_bridge():
+	print("PYTHON: init_py_bridge got called")
 	global pyeval_instance
-	pyeval_instance = __fd_pyeval(docpath)
-	fil = open("blaboc_init.txt", "w")
-	fil.write("bitchhhhhhhh")
-	fil.close()
+	pyeval_instance = __fd_pyeval("../")
 
 
 class __fd_pyeval:
@@ -94,13 +99,14 @@ class __fd_pyeval:
 			zero_y = np.zeros(pred_y.shape)
 			argmax_lst=np.argmax(pred_y,axis=1)
 			print("ARGAMX")
-			#print(argmax_lst)
+			conf = pred_y[0][argmax_lst[0]]
+			print(conf)
 			for i in range(len(argmax_lst)):
 				 zero_y[i][argmax_lst[i]]=1
 			pred_y=zero_y
 			corr_index = np.where(pred_y == 1)
 			truth = int(corr_index[1])
-			return truth #str(self.categories[truth])
+			return (truth, conf) #str(self.categories[truth])
 
 def eval_image(global_bool, url):
 	if global_bool == 0: # or sys.argv[2] == "local":
@@ -137,7 +143,7 @@ tempinstance = None
 
 if __name__ == "__main__":
  	#tempinstance = __fd_pyeval( "../../")
-	init_py_bridge("../../")
+	init_py_bridge()
 	# global g_docpath
 	# g_docpath = "../../"
 	app.run()

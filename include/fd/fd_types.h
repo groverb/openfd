@@ -1,23 +1,36 @@
 #ifndef _FD_TYPES_H
 #define _FD_TYPES_H
 
+// ---------- config
+#define API_MAX_RET_FOOD_COUNT 20
+
+#define SW_STEP_SIZE 30
+#define SW_WINDIMS_X 64
+#define SW_WINDIMS_Y 64
+
+#define NN_CONFIDENCE_THRESHOLD 0.99
+#define NN_CATEGORY_COUNT 101
+
+// ----------
+
+
 
 typedef struct {int x; int y; } __int2;
 typedef struct {float x; float y; } __float2;
 typedef struct {int x; int y; int z; } __int3;
 typedef struct {float x; float y; float z; } __float3;
 
-typedef struct _food_pose_t{
-	char* food_name;
-	__int2 food_pose;
-	__int2 projected_food_pose;
-} food_pose_t;
+typedef struct _food_pos_t{
+	char food_name[30];
+	__int2 food_pos;
+	__int2 projected_food_pos;
+} food_pos_t;
 
 typedef struct _fd_result_t{
 	int frame_id;
 	double timestamp;
 	int num_fooditems;
-	food_pose_t food_pos[10];
+	food_pos_t fooditems[20];
 } fd_result_t;
 
 
@@ -41,6 +54,7 @@ typedef enum _buffer_format{
 typedef struct _fd_config_t{
 	__int2 indims;
 	buffer_format format;
+	char docpath[30];
 } fd_config_t;
 
 #endif

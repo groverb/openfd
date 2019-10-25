@@ -43,6 +43,22 @@ size_t size(list* l);
 
 void print_list(list* l);
 
+
+#define free_list_custom(l,f){ \
+	node* temp;													\
+	while(l->HEAD != NULL){												\
+		temp = l->HEAD;												\
+		l->HEAD = l->HEAD->next;										\
+		(f)((temp->val));											\
+		free(temp);												\
+		temp = NULL;												\
+	}														\
+	l->size = 0;													\
+	int finalsz = l->size;												\
+	free(l);													\
+	l = NULL;													\
+}
+
 size_t free_list(list* l);
 
 

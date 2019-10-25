@@ -15,7 +15,7 @@ static int get_fc(image* ctx, __int2 windims){
 
 static image* create_window(image* ctx, __int2 windims, __int2 offset){
 	image* ret = make_image(windims);
-
+	memcpy(&ret->__relative_pos, &offset, sizeof(__int2));
 	size_t winsz = windims.x * windims.y;
 
 	for(int i = offset.x, pt = 0; i < offset.x + (ctx->dims.y * windims.y- 1); 
@@ -39,10 +39,11 @@ list* sw_get_frames(image* ctx, __int2 windims, int step){
 	size_t winsz = windims.x * windims.y;
 
 	int fc = get_fc(ctx, windims);
-	printf("fc: %d\n", fc);
 
-	if(fc == 0){
+	if(fc == 1){
 		image* ctx_cp = image_cp(ctx);
+
+		if(ctx_cp == NULL){ printf("image_cp() returned null\n"); }
 		push_back(ret, ctx_cp, 'u');
 	}
 	else{
@@ -70,7 +71,6 @@ static void foreach_frame(list* l){
 		while(cur != NULL){
 			char fname[10];
 			sprintf(fname, "%d.bmp", i);
-			image_write((image*)(cur->val), fname);
 			cur = cur->next;
 			i++;
 		}

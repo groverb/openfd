@@ -69,12 +69,13 @@ int push_back(list* l, void* val, char type){
 		new_node->next = NULL;
 		new_node->val = val;
 		new_node->type = type;
+		l->size++;
 		if(l->HEAD == NULL && l->TAIL == NULL){ l->TAIL = l->HEAD = new_node; return 1; }
 
 		new_node->prev = l->TAIL;
 		l->TAIL->next = new_node;
 		l->TAIL = l->TAIL->next;
-		l->size++;
+		printf("incremented size\n");
 		return 1;
 	}
 
@@ -182,6 +183,7 @@ void print_list(list* l){
 		}
 	}
 }
+
 
 size_t free_list(list* l){
 	node* temp;

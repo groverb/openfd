@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -52,12 +53,34 @@ image* make_image(__int2 imagedims){
 	}
 
 	memcpy(&ret->dims, &imagedims, sizeof(ret->dims));
+	ret->__relative_pos.x = ret->__relative_pos.y = 0;
+
 	return ret;
 }
 
+void free_image(image* ctx){
+	printf("free img called\n");
+
+	if(ctx != NULL){
+		size_t imgsz = ctx->dims.x * ctx->dims.y;
+		for(int i =0;i<(int)imgsz;i++){
+			if(ctx->data[i] != NULL){
+				free(ctx->data[i]);
+			}
+		}
+		free(ctx->data);
+		free(ctx);
+	}
+}
+
+
 image* image_cp(image* ctx){
 	image* ret = make_image(ctx->dims);
-	memcpy(ret->data, ctx->data, sizeof(pixel) * ctx->dims.x * ctx->dims.y);
+
+	for(int i=0;i< ctx->dims.x * ctx->dims.y; i++){
+		memcpy(ret->data[i], ctx->data[i], sizeof(pixel));;
+	}
+	memcpy(ret->data, ctx->data, sizeof(pixel*));
 	return ret;
 }
 
@@ -69,50 +92,35 @@ void image_write(image* ctx, const char* fname){
 	outbmp->Data = buff;
 
 	BMP_WriteFile(outbmp, fname);
-//	BMP_Free(outbmp);
+	//	BMP_Free(outbmp);
 #endif
-
 }
+
 image* buffer_to_image(uint8_t* buff, __int2 imagedims){
 	image* ret = make_image(imagedims);
 	if(ret != NULL){
-		printf("not null\n");
 		size_t imgsz = imagedims.x * imagedims.y;
 		size_t buffsz = imgsz * 3;
 
-		for(int i=0, j=0; j< buffsz; i++, j+=3){
-			// printf("i: %d, j: %d\n", i, j);
+		for(int i=0, j=0; j<(int)buffsz; i++, j+=3){
 
 			ret->data[i]->r = buff[j];
 			ret->data[i]->g = buff[j+1];
 			ret->data[i]->b = buff[j+2];
 
 		}
-		return ret;
 	}
+	return ret;
 }
-
-void free_image(image* ctx){
-	if(ctx != NULL){
-		size_t imgsz = ctx->dims.x * ctx->dims.y;
-		for(int i =0;i<imgsz;i++){
-			free(ctx->data[i]);
-		}
-		free(ctx->data);
-		free(ctx);
-	}
-}
-
 uint8_t* image_to_buffer(image* ctx){
 	size_t imgsz = ctx->dims.x * ctx->dims.y;
 	size_t buffsz = imgsz * 3;
-	uint8_t* ret = malloc(sizeof(uint8_t) * buffsz);
+	uint8_t* ret = calloc(sizeof(uint8_t) , buffsz);
 	if(ret != NULL){
-		for(int i =0,j=0;j< buffsz; i++, j+=3){
-			pixel* temp = ctx->data[i]; 
-			ret[j] = temp->r;
-			ret[j+1] = temp->g;
-			ret[j+2] = temp->b;
+		for(int i =0,j=0;j<(int) buffsz; i++, j+=3){
+			ret[j] = ctx->data[i]->r;
+			ret[j+1] = ctx->data[i]->g;
+			ret[j+2] = ctx->data[i]->b;
 		}
 	}
 	return ret;
@@ -137,8 +145,120 @@ image* image_resample(image* ctx, __int2 outdims, pixel (*f)(pixel, pixel)){
 	return ret;
 }
 
+static inline int _sign(int num){
+	return ( (num > 0) ? 1 : ((num < 0) ? -1 : 0) );
+}
+
+
+void image_draw_point(image* ctx, __int2 pt, pixel* clr){
+	if(ctx != NULL && clr != NULL){
+		ctx->data[pt.y * ctx->dims.x + pt.x ]->r = clr->r;
+		ctx->data[pt.y * ctx->dims.x + pt.x ]->g = clr->g;
+		ctx->data[pt.y * ctx->dims.x + pt.x ]->b = clr->b;
+	}
+}
+
+
+void image_draw_diag(image* ctx, __int2 pt1, __int2 pt2, pixel* clr){
+	if(ctx != NULL && clr != NULL){
+		int deltax = pt2.x - pt1.x;
+		int deltay = pt2.y - pt1.y;
+
+		float deltaerr = abs(deltay / (float) deltax);
+
+		float err = 0.f;
+		int j = pt1.x;
+		__int2 curpt = {.x = j};;
+
+		for(int i = pt1.y; i<pt2.y; i++){
+			curpt.y = i;	
+			image_draw_point(ctx, curpt, clr);
+			err = err + deltaerr;
+
+			if(err >= 0.5f){
+				j += _sign(deltay) * 1;
+				curpt.x = j;
+				err -= 1.f;
+			}
+		}
+	}
+}
+
+
+void image_draw_line(image* ctx, __int2 pt1, __int2 pt2, pixel* clr){
+	int deltax = pt2.x - pt1.x;
+	int deltay = pt2.y - pt1.y;
+	__int2 curpt; 
+
+	if(deltax == 0){ // horizontal 
+		curpt.x = pt1.x ;
+		for(int i = pt1.y; i<pt2.y;i++){
+			curpt.y = i;
+			image_draw_point(ctx, curpt, clr);
+		}
+	}
+	else if(deltay == 0){ // veritcal
+		curpt.y = pt1.y ;
+		for(int i = pt1.x; i<pt2.x;i++){
+			curpt.x = i;
+			image_draw_point(ctx, curpt, clr);
+		}
+	}
+	else{
+		image_draw_diag(ctx, pt1, pt2, clr);
+	}
+
+}
+
+
+
+
+void image_draw_square(image* ctx, __int2 bottomleft, __int2 topright, pixel* clr){
+	if(ctx != NULL && clr != NULL){
+		__int2 topleft = {topright.x, bottomleft.y};
+		__int2 bottomright = {bottomleft.x, topright.y};
+
+		image_draw_line(ctx,  bottomleft, bottomright,clr);
+		image_draw_line(ctx, bottomleft, topleft, clr);
+		image_draw_line(ctx , topleft, topright,  clr);
+		image_draw_line(ctx, bottomright, topright, clr);
+	}
+}
+
 
 #if 0 
+
+
+int main(int argc, char** argv){
+	FILE* imgf;
+	imgf = fopen(argv[1], "rb");
+
+	uint8_t header[54];
+	fread(header, 1, 54, imgf);
+
+	__int2 indims = {.x = atoi(argv[2]) , .y=atoi(argv[3])  };
+
+	size_t buffsz = indims.x * indims.y * 3;
+
+	uint8_t* buff = malloc(sizeof(uint8_t) * buffsz);
+	fread(buff, 1, buffsz, imgf);
+
+	image* img = buffer_to_image(buff, indims);
+	__int2 pta = {20,20};
+	__int2 ptb = {510,510};
+	pixel color = {255, 255, 0}; //green
+
+	printf("pta: %d, %d\n", pta.x, pta.y);
+	printf("ptb: %d, %d\n", ptb.x, ptb.y);
+	image_draw_square(img,pta, ptb, &color);
+
+	image_draw_line(img, pta, ptb, &color);
+
+	image_write(img, "withline.bmp");
+
+	return 0;
+
+}
 
 int main(int argc, char** argv){
 
