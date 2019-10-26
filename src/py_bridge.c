@@ -125,14 +125,14 @@ fd_status free_py_bridge(){
 			Py_REFCNT(pvalue), Py_REFCNT(pmodule)
 			);
 
-
+/*
 	while(Py_REFCNT(pmain_func) ==1 ){ Py_XDECREF(pmain_func);} 
 	while(Py_REFCNT(pinit_func) ==1){ Py_XDECREF(pinit_func);} 
 	while(Py_REFCNT(pname)==1 ){ Py_XDECREF(pname);} 
 	while(Py_REFCNT(pargs)==1 ){ Py_XDECREF(pargs);} 
 	while(Py_REFCNT(pvalue)==1 ){ Py_XDECREF(pvalue);} 
 	while(Py_REFCNT(pmodule) ==1){ Py_XDECREF(pmodule);}
-
+*/
 	 Py_Finalize();
 printf("pmainfunc: %d, pinitfunc: %d, pname: %d, pargs: %d, pvalue: %d, pmodule: %d\n", Py_REFCNT(pmain_func),    Py_REFCNT(pinit_func),
 			Py_REFCNT(pname),

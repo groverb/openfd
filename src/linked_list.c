@@ -75,7 +75,6 @@ int push_back(list* l, void* val, char type){
 		new_node->prev = l->TAIL;
 		l->TAIL->next = new_node;
 		l->TAIL = l->TAIL->next;
-		printf("incremented size\n");
 		return 1;
 	}
 

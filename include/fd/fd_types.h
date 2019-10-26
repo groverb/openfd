@@ -2,15 +2,19 @@
 #define _FD_TYPES_H
 
 // ---------- config
-#define API_MAX_RET_FOOD_COUNT 20
+#define API_MAX_RET_FOOD_COUNT 80 
 
-#define SW_STEP_SIZE 30
-#define SW_WINDIMS_X 64
+#define EVAL_INPUT_SIZE_X 512
+#define EVAL_INPUT_SIZE_Y 512
+
+#define SW_STEP_SIZE 50 
+#define SW_WINDIMS_X 64 
 #define SW_WINDIMS_Y 64
 
-#define NN_CONFIDENCE_THRESHOLD 0.99
+#define NN_CONFIDENCE_THRESHOLD 0.999
 #define NN_CATEGORY_COUNT 101
 
+#define dbg 1
 // ----------
 
 
@@ -24,13 +28,14 @@ typedef struct _food_pos_t{
 	char food_name[30];
 	__int2 food_pos;
 	__int2 projected_food_pos;
+	double __confidence;
 } food_pos_t;
 
 typedef struct _fd_result_t{
 	int frame_id;
 	double timestamp;
 	int num_fooditems;
-	food_pos_t fooditems[20];
+	food_pos_t fooditems[80];
 } fd_result_t;
 
 

@@ -34,11 +34,10 @@ g_session = tf.Session()
 g_graph = tf.get_default_graph()
 g_docpath = "../"
 g_initb = False
+g_count = 0
 
 def py_eval(buff):
-	print("PYTHON: py_eval()")
 	# import cStringIO
-	print(len(buff))
 	npbuff = np.asarray(buff)
 	npbuff = npbuff.reshape((64, 64,3))
 	# transpoe
@@ -46,12 +45,13 @@ def py_eval(buff):
 	npbuff = np.flip(npbuff, 0)
 	# npbuff = np.flip(npbuff, 1)
 	img = Image.fromarray(npbuff.astype('uint8'), 'RGB')
-	img.save("py_received.png")
+	img.save("pyout.png")
+	global g_count
+	img.save(str("py_out/" + str(g_count) + ".png"))
+	g_count = g_count + 1;
 	npbuff = npbuff.astype(float)/255.
 	npbuff_expanded = np.expand_dims(npbuff, axis = 0)
 	temp =  pyeval_instance._eval(npbuff_expanded)
-	print("PYTHON: ")
-	print(temp)
 	return temp
 
 
@@ -93,14 +93,11 @@ class __fd_pyeval:
 		with g_graph.as_default():
 			set_session(g_session)
 			pred_y = self.model.predict(img_np)
-			print("PRED Y")
 			k = 0
 		
 			zero_y = np.zeros(pred_y.shape)
 			argmax_lst=np.argmax(pred_y,axis=1)
-			print("ARGAMX")
 			conf = pred_y[0][argmax_lst[0]]
-			print(conf)
 			for i in range(len(argmax_lst)):
 				 zero_y[i][argmax_lst[i]]=1
 			pred_y=zero_y

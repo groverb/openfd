@@ -14,7 +14,7 @@
 #define DBG 0 
 #define WRITE_BMP 1
 
-static pixel pixel_max(pixel pa, pixel pb){
+pixel pixel_max(pixel pa, pixel pb){
 	pixel ret;
 	ret.r = pa.r > pb.r ? pa.r : pb.r;
 	ret.g = pa.g > pb.g ? pa.g : pb.g;
@@ -23,7 +23,7 @@ static pixel pixel_max(pixel pa, pixel pb){
 }
 
 
-static pixel pixel_min(pixel pa, pixel pb){
+pixel pixel_min(pixel pa, pixel pb){
 	pixel ret;
 	ret.r = pa.r < pb.r ? pa.r : pb.r;
 	ret.g = pa.g < pb.g ? pa.g : pb.g;
@@ -33,7 +33,7 @@ static pixel pixel_min(pixel pa, pixel pb){
 
 
 
-static pixel pixel_avg(pixel pa, pixel pb){
+pixel pixel_avg(pixel pa, pixel pb){
 	pixel ret; 
 	ret.r = (uint8_t)((pa.r + pb.r)/2.f);
 	ret.g = (uint8_t)((pa.g + pb.g)/2.f);
@@ -59,7 +59,6 @@ image* make_image(__int2 imagedims){
 }
 
 void free_image(image* ctx){
-	printf("free img called\n");
 
 	if(ctx != NULL){
 		size_t imgsz = ctx->dims.x * ctx->dims.y;
@@ -151,9 +150,9 @@ static inline int _sign(int num){
 
 void image_draw_point(image* ctx, __int2 pt, pixel* clr){
 	if(ctx != NULL && clr != NULL){
-		ctx->data[pt.y * ctx->dims.x + pt.x ]->r = clr->r;
-		ctx->data[pt.y * ctx->dims.x + pt.x ]->g = clr->g;
-		ctx->data[pt.y * ctx->dims.x + pt.x ]->b = clr->b;
+		ctx->data[pt.x * ctx->dims.x + pt.y ]->r = clr->r;
+		ctx->data[pt.x * ctx->dims.x + pt.y ]->g = clr->g;
+		ctx->data[pt.x * ctx->dims.x + pt.y ]->b = clr->b;
 	}
 }
 
@@ -213,7 +212,7 @@ void image_draw_line(image* ctx, __int2 pt1, __int2 pt2, pixel* clr){
 
 
 void image_draw_square(image* ctx, __int2 bottomleft, __int2 topright, pixel* clr){
-	if(ctx != NULL && clr != NULL){
+	if(ctx != NULL && clr != NULL && bottomleft.x <= ctx->dims.x && bottomleft.y <= ctx->dims.y && topright.x <= ctx->dims.x && topright.y <= ctx->dims.y){
 		__int2 topleft = {topright.x, bottomleft.y};
 		__int2 bottomright = {bottomleft.x, topright.y};
 

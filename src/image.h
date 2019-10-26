@@ -45,5 +45,12 @@ void image_draw_line(image* ctx, __int2 pt1, __int2 pt2, pixel* clr);
 
 void image_draw_square(image* ctx, __int2 bottomleft, __int2 topright, pixel* clr);
 
+
+pixel pixel_max(pixel pa, pixel pb);
+
+pixel pixel_min(pixel pa, pixel pb);
+
+pixel pixel_avg(pixel pa, pixel pb);
+
 #endif
 
