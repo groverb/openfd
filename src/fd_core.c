@@ -18,7 +18,7 @@ static list* _doneq = NULL;
 
 static fd_status load_categories(){
 	FILE* catf;
-	char catfpath[50];
+	char catfpath[100];
 	sprintf(catfpath, "%s/categories.txt", _g_config->docpath);
 	catf = fopen(catfpath, "r");
 	if(catf != NULL){
@@ -39,7 +39,7 @@ fd_status fd_init(fd_config_t config){
 
 	_g_config = malloc(sizeof(fd_config_t));
 	memcpy(_g_config, &config, sizeof(fd_config_t));
-
+	printf("init: %s\n" ,_g_config->docpath);
 	assert(load_categories() == fd_ok);
 	return init_py_bridge(_g_config->docpath);
 }

@@ -125,21 +125,30 @@ uint8_t* image_to_buffer(image* ctx){
 }
 
 image* image_resample(image* ctx, __int2 outdims, pixel (*f)(pixel, pixel)){
+	// TODO: user aspect ratio to adjust downsample metrics
 	image* ret = make_image(outdims);
-
+	size_t mxpt = ctx->dims.x * ctx->dims.y;
+	printf("in here\n");
 	if(ret != NULL){
-		for(int i =0;i<outdims.y;i++){
-			for(int j=0;j<outdims.x;j++){
+		for(int i =0;i<outdims.x- 4;i++){
+			for(int j=0;j< outdims.y -4;j++){
 				int pt = (ctx->dims.x * 2) * i + (j * 2);
+				printf("i: %d, j: %d, pt: %d, indims: %d,%d, outdims: %d,%d ", i, j, pt, ctx->dims.x, ctx->dims.y, outdims.x, outdims.y);
+				printf("%d %d %d %d\n",pt, pt + 1, (pt + ctx->dims.x), (pt + ctx->dims.x + 1 ));
 
+				if((pt + ctx->dims.x + 1 ) > mxpt){
+					goto resample_done;
+				}
 				pixel cmp =  f(*(ctx->data[pt]),
 						f( *(ctx->data[pt + 1]), f(*(ctx->data[pt + ctx->dims.x]), *(ctx->data[pt + ctx->dims.x + 1]))));
-
+				
+				printf("cmp\n");
 				memcpy(ret->data[i * outdims.x + j], &cmp, sizeof(pixel));
 
 			}
 		}
 	}
+resample_done:
 	return ret;
 }
 

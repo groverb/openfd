@@ -25,7 +25,7 @@ static PyObject* atoplist(uint8_t* buff, size_t buff_len){
 	}
 	return ret_list;
 }
-
+/*
 static void load_categories(const char* docpath, char** out, size_t catsz){
 	char catfpath[20];
 	sprintf(catfpath, "%s/categories.txt", docpath);
@@ -38,12 +38,12 @@ static void load_categories(const char* docpath, char** out, size_t catsz){
 		fclose(catf);
 	}
 }
-
+*/
 
 fd_status init_py_bridge(const char* docpath){
 
 	// setenv("PYTHONPATH", _g_python_path ,1);
-	setenv("PYTHONPATH", ".", 1);
+	setenv("PYTHONPATH", docpath, 1);
 
 	Py_Initialize();
 	pname = PyUnicode_DecodeFSDefault("__eval__");
@@ -58,10 +58,12 @@ fd_status init_py_bridge(const char* docpath){
 
 
 		// call init_py_bridge
-		pargs = PyTuple_New(0);
-		// PyObject* py_docpath = PyUnicode_DecodeFSDefault(docpath);
+		pargs = PyTuple_New(1);
+		PyObject* py_docpath = PyUnicode_DecodeUTF8(docpath, strlen(docpath), NULL );
+		
+		if(py_docpath == NULL){ printf("NULL docpath\n");}
 		//  PyObject* py_docpath = PyString_FromString(docpath);
-		// PyTuple_SetItem(pargs, 0, py_docpath);
+		PyTuple_SetItem(pargs, 0, py_docpath);
 
 		pvalue = PyObject_CallObject(pinit_func, pargs );
 

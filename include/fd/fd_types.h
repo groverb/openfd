@@ -4,17 +4,19 @@
 // ---------- config
 #define API_MAX_RET_FOOD_COUNT 80 
 
-#define EVAL_INPUT_SIZE_X 512
+#define EVAL_INPUT_SIZE_X 512 
 #define EVAL_INPUT_SIZE_Y 512
 
-#define SW_STEP_SIZE 50 
+#define SW_STEP_SIZE 200 
 #define SW_WINDIMS_X 64 
 #define SW_WINDIMS_Y 64
 
 #define NN_CONFIDENCE_THRESHOLD 0.999
 #define NN_CATEGORY_COUNT 101
 
-#define dbg 1
+// dbg levels (val: 0,1)
+#define dbgl1 1
+#define dbgl2 0
 // ----------
 
 
@@ -59,7 +61,7 @@ typedef enum _buffer_format{
 typedef struct _fd_config_t{
 	__int2 indims;
 	buffer_format format;
-	char docpath[30];
+	char docpath[100];
 } fd_config_t;
 
 #endif

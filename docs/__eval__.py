@@ -44,21 +44,23 @@ def py_eval(buff):
 	npbuff = np.flip(npbuff, 2)
 	npbuff = np.flip(npbuff, 0)
 	# npbuff = np.flip(npbuff, 1)
-	img = Image.fromarray(npbuff.astype('uint8'), 'RGB')
-	img.save("pyout.png")
+	#img = Image.fromarray(npbuff.astype('uint8'), 'RGB')
+	#img.save("pyout.png")
 	global g_count
-	img.save(str("py_out/" + str(g_count) + ".png"))
-	g_count = g_count + 1;
+	#img.save(str("py_out/" + str(g_count) + ".png"))
+	#g_count = g_count + 1;
 	npbuff = npbuff.astype(float)/255.
 	npbuff_expanded = np.expand_dims(npbuff, axis = 0)
 	temp =  pyeval_instance._eval(npbuff_expanded)
 	return temp
 
 
-def init_py_bridge():
-	print("PYTHON: init_py_bridge got called")
+def init_py_bridge(docpath):
+	print("PYTHON: Initializing py bridge ")
+	print("PYTHON: docpath: " + docpath)
+	print()
 	global pyeval_instance
-	pyeval_instance = __fd_pyeval("../")
+	pyeval_instance = __fd_pyeval(docpath)
 
 
 class __fd_pyeval:
@@ -140,7 +142,7 @@ tempinstance = None
 
 if __name__ == "__main__":
  	#tempinstance = __fd_pyeval( "../../")
-	init_py_bridge()
+	init_py_bridge('./')
 	# global g_docpath
 	# g_docpath = "../../"
 	app.run()
