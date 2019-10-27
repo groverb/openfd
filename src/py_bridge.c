@@ -25,20 +25,6 @@ static PyObject* atoplist(uint8_t* buff, size_t buff_len){
 	}
 	return ret_list;
 }
-/*
-static void load_categories(const char* docpath, char** out, size_t catsz){
-	char catfpath[20];
-	sprintf(catfpath, "%s/categories.txt", docpath);
-	FILE* catf = fopen(catfpath, "r");
-	if(catf != NULL){
-		for(int i =0;i<(int)catsz; i++){
-			out[i] = malloc(20 * sizeof(char));
-			fscanf(catf, "%s", out[i]);
-		}
-		fclose(catf);
-	}
-}
-*/
 
 fd_status init_py_bridge(const char* docpath){
 
@@ -60,7 +46,7 @@ fd_status init_py_bridge(const char* docpath){
 		// call init_py_bridge
 		pargs = PyTuple_New(1);
 		PyObject* py_docpath = PyUnicode_DecodeUTF8(docpath, strlen(docpath), NULL );
-		
+
 		if(py_docpath == NULL){ printf("NULL docpath\n");}
 		//  PyObject* py_docpath = PyString_FromString(docpath);
 		PyTuple_SetItem(pargs, 0, py_docpath);
@@ -74,7 +60,7 @@ fd_status init_py_bridge(const char* docpath){
 }
 
 
-py_ret_tup _py_eval(uint8_t* buff, size_t buff_len){
+void _py_eval(uint8_t* buff, size_t buff_len, py_ret_tup* ctx){
 
 	// Py_Initialize();
 	//pname = PyUnicode_DecodeFSDefault("__eval__");
@@ -97,9 +83,9 @@ py_ret_tup _py_eval(uint8_t* buff, size_t buff_len){
 			double cconf = PyFloat_AsDouble(conf);
 			int ccat = (int) PyFloat_AsDouble(cat);
 
-			py_ret_tup ret = {.category = ccat, .confidence = cconf};
+			ctx->category = ccat;
+			ctx->confidence = cconf;
 
-			return ret;
 
 			// Py_DECREF(pargs);
 		}
@@ -118,29 +104,7 @@ py_ret_tup _py_eval(uint8_t* buff, size_t buff_len){
 
 
 fd_status free_py_bridge(){
-	// dbg
-	
-	printf("available py refrences: \n");
-	printf("pmainfunc: %d, pinitfunc: %d, pname: %d, pargs: %d, pvalue: %d, pmodule: %d\n", Py_REFCNT(pmain_func),    Py_REFCNT(pinit_func),
-			Py_REFCNT(pname),
-			Py_REFCNT(pargs),
-			Py_REFCNT(pvalue), Py_REFCNT(pmodule)
-			);
-
-/*
-	while(Py_REFCNT(pmain_func) ==1 ){ Py_XDECREF(pmain_func);} 
-	while(Py_REFCNT(pinit_func) ==1){ Py_XDECREF(pinit_func);} 
-	while(Py_REFCNT(pname)==1 ){ Py_XDECREF(pname);} 
-	while(Py_REFCNT(pargs)==1 ){ Py_XDECREF(pargs);} 
-	while(Py_REFCNT(pvalue)==1 ){ Py_XDECREF(pvalue);} 
-	while(Py_REFCNT(pmodule) ==1){ Py_XDECREF(pmodule);}
-*/
-	 Py_Finalize();
-printf("pmainfunc: %d, pinitfunc: %d, pname: %d, pargs: %d, pvalue: %d, pmodule: %d\n", Py_REFCNT(pmain_func),    Py_REFCNT(pinit_func),
-			Py_REFCNT(pname),
-			Py_REFCNT(pargs),
-			Py_REFCNT(pvalue), Py_REFCNT(pmodule)
-			);
+	Py_Finalize();
 	return fd_ok;
 
 }

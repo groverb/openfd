@@ -54,7 +54,6 @@ void print_list(list* l);
 		temp = NULL;												\
 	}														\
 	l->size = 0;													\
-	int finalsz = l->size;												\
 	free(l);													\
 	l = NULL;													\
 }

@@ -15,39 +15,6 @@ static int get_fc(image* ctx, __int2 windims){
 static image* create_window(image* ctx, __int2 windims, __int2 offset){
 
 	__int2 end = {offset.x + SW_WINDIMS_X, offset.y + SW_WINDIMS_Y};
-	int startpt = offset.x * ctx->dims.x + offset.y;
-
-	image* ret = make_image(windims);
-	memcpy(&(ret->__relative_pos), &offset, sizeof(__int2));
-	size_t winsz = windims.x * windims.y;
-
-	int pt = 0;
-
-	for(int i = startpt; i < startpt + ((ctx->dims.y * windims.y) ); 
-			i+=ctx->dims.x){
-
-		for(int j = i; j< i + windims.y; j++){
-			ret->data[pt]->r = ctx->data[j]->r;
-			ret->data[pt]->g = ctx->data[j]->g;
-			ret->data[pt]->b = ctx->data[j]->b;
-			pt++;
-
-		}
-	}
-#if dbgl2
-	static int __idk = 0;
-	char fpath[30];
-	sprintf(fpath, "bmpo/%d.bmp", __idk++);
-	image_write(ret, fpath);
-#endif
-
-	return ret;
-}
-
-
-static image* __create_window(image* ctx, __int2 windims, __int2 offset){
-
-	__int2 end = {offset.x + SW_WINDIMS_X, offset.y + SW_WINDIMS_Y};
 
 	int startpt = offset.x * ctx->dims.x + offset.y;
 	int endpt = (end.x * (ctx->dims.x) + end.y) -1;
@@ -78,8 +45,6 @@ static image* __create_window(image* ctx, __int2 windims, __int2 offset){
 
 list* sw_get_frames(image* ctx, __int2 windims, int step){
 	list* ret = make_list();
-	size_t imgsz = ctx->dims.x * ctx->dims.y;
-	size_t winsz = windims.x * windims.y;
 
 	int fc = get_fc(ctx, windims);
 	if(fc == 1){
@@ -89,7 +54,6 @@ list* sw_get_frames(image* ctx, __int2 windims, int step){
 		push_back(ret, ctx_cp, 'u');
 	}
 	else{
-		pixel blue = {0, 0, 255};
 		int c = 0;
 
 		for(int i = 0;i< (ctx->dims.x  ) - (windims.x ) ; i++){
@@ -99,9 +63,7 @@ list* sw_get_frames(image* ctx, __int2 windims, int step){
 					__int2 offset = {j,i};
 					__int2 end = {j+SW_WINDIMS_X, i+SW_WINDIMS_Y};
 					if(end.x >= ctx->dims.x || end.y >= ctx->dims.y) { goto sw_done; }
-
-					pixel blue = {0,0,255};
-					push_back(ret, __create_window(ctx, windims, offset), 'u');
+					push_back(ret, create_window(ctx, windims, offset), 'u');
 
 				}
 			}
@@ -113,20 +75,6 @@ sw_done:
 	image_write(ctx, "swdone.bmp");
 #endif
 	return ret;
-
-}
-
-static void foreach_frame(list* l){
-	int i = 0;
-	if(l != NULL){
-		node* cur = l->HEAD;
-		while(cur != NULL){
-			char fname[10];
-			sprintf(fname, "%d.bmp", i);
-			cur = cur->next;
-			i++;
-		}
-	}
 
 }
 

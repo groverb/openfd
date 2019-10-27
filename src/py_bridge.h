@@ -15,7 +15,7 @@ typedef struct _py_ret_tup{
 
 fd_status init_py_bridge(const char* docpath);
 
-py_ret_tup _py_eval(uint8_t* buff, size_t buff_len);
+void _py_eval(uint8_t* buff, size_t buff_len, py_ret_tup* ctx );
 
 fd_status free_py_bridge();
 

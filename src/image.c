@@ -41,9 +41,6 @@ pixel pixel_avg(pixel pa, pixel pb){
 	return ret;
 }
 
-static pixel pixel_rand(pixel* a, pixel* b){
-	return (rand() & 1) ? *a : *b;
-}
 
 image* make_image(__int2 imagedims){
 	image* ret = malloc(sizeof(image));

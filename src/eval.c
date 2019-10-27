@@ -18,7 +18,6 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 	image* ctx = buffer_to_image((uint8_t*) buffer, _g_config->indims);
 	// sliding window
 	__int2 windims = {SW_WINDIMS_X, SW_WINDIMS_Y};
-	int step = SW_STEP_SIZE;
 
 	if(ctx != NULL){
 		list* frames = NULL;
@@ -39,8 +38,6 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 		// parse list
 		if(frames != NULL){
 			node* cur = frames->HEAD;
-			int fid = 0,c=0;
-
 			do{	
 				// eval each frame
 				food_pos_t* out = eval((image*)(cur->val));	
@@ -104,7 +101,8 @@ food_pos_t* eval(image* ctx){
 	if(ctx != NULL){	
 		uint8_t* ctx_buff = image_to_buffer(ctx);
 		if(ctx_buff !=  NULL){
-			py_ret_tup res = _py_eval(ctx_buff, ctx->dims.x * ctx->dims.y * 3);
+			py_ret_tup res;
+			_py_eval(ctx_buff, ctx->dims.x * ctx->dims.y * 3, &res);
 
 			if(res.confidence >= NN_CONFIDENCE_THRESHOLD){
 				ret = malloc(sizeof(food_pos_t));

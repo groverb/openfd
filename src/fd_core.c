@@ -18,7 +18,7 @@ static list* _doneq = NULL;
 
 static fd_status load_categories(){
 	FILE* catf;
-	char catfpath[100];
+	char catfpath[150];
 	sprintf(catfpath, "%s/categories.txt", _g_config->docpath);
 	catf = fopen(catfpath, "r");
 	if(catf != NULL){
