@@ -30,6 +30,7 @@ fd_status init_py_bridge(const char* docpath){
 
 	// setenv("PYTHONPATH", _g_python_path ,1);
 	setenv("PYTHONPATH", docpath, 1);
+	printf("2\n");
 
 	Py_Initialize();
 	pname = PyUnicode_DecodeFSDefault("__eval__");
@@ -55,6 +56,7 @@ fd_status init_py_bridge(const char* docpath){
 
 		return fd_ok;
 	}
+	PyErr_Print();
 	return fd_nullptr;
 
 }

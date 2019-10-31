@@ -139,7 +139,6 @@ image* image_resample(image* ctx, __int2 outdims, pixel (*f)(pixel, pixel)){
 				pixel cmp =  f(*(ctx->data[pt]),
 						f( *(ctx->data[pt + 1]), f(*(ctx->data[pt + ctx->dims.x]), *(ctx->data[pt + ctx->dims.x + 1]))));
 				
-				printf("cmp\n");
 				memcpy(ret->data[i * outdims.x + j], &cmp, sizeof(pixel));
 
 			}

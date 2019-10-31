@@ -11,7 +11,6 @@ from tensorflow.python.util import deprecation
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 deprecation._PRINT_DEPRECATION_WARNINGS = False
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
-import h5py
 import skimage
 import matplotlib.pyplot as plt
 import sys

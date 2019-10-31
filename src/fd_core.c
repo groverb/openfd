@@ -36,12 +36,23 @@ static fd_status load_categories(){
 fd_status fd_init(fd_config_t config){
 	_waitq = make_list();
 	_doneq = make_list();
-
+	
 	_g_config = malloc(sizeof(fd_config_t));
 	memcpy(_g_config, &config, sizeof(fd_config_t));
-	printf("init: %s\n" ,_g_config->docpath);
+#ifdef PYTHON_SERVER
+	char* external_docpath = getenv("PYTHON_SERVER_PATH");
+	if(external_docpath != NULL){
+		strcpy(_g_config->docpath, external_docpath );
+	}
+#endif
+	
 	assert(load_categories() == fd_ok);
 	return init_py_bridge(_g_config->docpath);
+}
+
+fd_status fd_configure_input(fd_config_t config){
+	memcpy(_g_config, &config, sizeof(fd_config_t));
+	return fd_ok;
 }
 
 fd_status fd_submit_image_buffer(int frameid, void* buffer){
@@ -77,6 +88,7 @@ fd_status fd_get_last_result(fd_result_t* result){
 fd_status fd_get_result_sync(int frameid, void* buffer, fd_result_t* result){
 	return exec_eval_pipeline((uint8_t*) buffer, result);
 }
+
 
 
 fd_status fd_shutdown(){

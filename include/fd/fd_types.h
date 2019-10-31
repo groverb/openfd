@@ -4,19 +4,21 @@
 // ---------- config
 #define API_MAX_RET_FOOD_COUNT 80 
 
-#define EVAL_INPUT_SIZE_X 512 
-#define EVAL_INPUT_SIZE_Y 512
+#define EVAL_INPUT_SIZE_X 2000 
+#define EVAL_INPUT_SIZE_Y 2000
 
-#define SW_STEP_SIZE 200 
+#define SW_STEP_SIZE 100 
 #define SW_WINDIMS_X 64 
 #define SW_WINDIMS_Y 64
 
 #define NN_CONFIDENCE_THRESHOLD 0.999
 #define NN_CATEGORY_COUNT 101
 
+// #define PYTHON_SERVER
+
 // dbg levels (val: 0,1)
 #define dbgl1 1
-#define dbgl2 0
+#define dbgl2 1 
 // ----------
 
 
