@@ -2,10 +2,19 @@
 #define _FD_TYPES_H
 
 // ---------- config
+#define PYTHON_EVAL 0
+#define DKNET_EVAL	1
+
 #define API_MAX_RET_FOOD_COUNT 80 
 
 #define EVAL_INPUT_SIZE_X 2000 
 #define EVAL_INPUT_SIZE_Y 2000
+
+#define DKNET_INPUT_H 416 
+#define DKNET_INPUT_W 416 
+#define DKNET_THRESHOLD 0.5
+
+#define EVAL_INPUT_SIZE_W 2000
 
 #define SW_STEP_SIZE 100 
 #define SW_WINDIMS_X 64 
@@ -29,8 +38,9 @@ typedef struct {int x; int y; int z; } __int3;
 typedef struct {float x; float y; float z; } __float3;
 
 typedef struct _food_pos_t{
-	char food_name[30];
-	__int2 food_pos;
+	char food_name[100];
+	__int2 pos_topright;
+	__int2 pos_bottomleft;
 	__int2 projected_food_pos;
 	double __confidence;
 } food_pos_t;

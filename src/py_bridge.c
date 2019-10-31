@@ -62,7 +62,7 @@ fd_status init_py_bridge(const char* docpath){
 }
 
 
-void _py_eval(uint8_t* buff, size_t buff_len, py_ret_tup* ctx){
+void _py_eval(uint8_t* buff, size_t buff_len, ret_tup* ctx){
 
 	// Py_Initialize();
 	//pname = PyUnicode_DecodeFSDefault("__eval__");

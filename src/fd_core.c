@@ -10,6 +10,8 @@
 #include "linked_list.h"
 #include "eval.h"
 #include "py_bridge.h"
+#include "darknet.h"
+#include "dknet_bridge.h"
 
 fd_config_t* _g_config = NULL;
 char _g_categories_lut[NN_CATEGORY_COUNT][30];
@@ -39,6 +41,7 @@ fd_status fd_init(fd_config_t config){
 	
 	_g_config = malloc(sizeof(fd_config_t));
 	memcpy(_g_config, &config, sizeof(fd_config_t));
+#if PYTHON_EVAL
 #ifdef PYTHON_SERVER
 	char* external_docpath = getenv("PYTHON_SERVER_PATH");
 	if(external_docpath != NULL){
@@ -48,7 +51,11 @@ fd_status fd_init(fd_config_t config){
 	
 	assert(load_categories() == fd_ok);
 	return init_py_bridge(_g_config->docpath);
-}
+
+#elif DKNET_EVAL
+	return init_dknet_bridge();
+#endif
+	}
 
 fd_status fd_configure_input(fd_config_t config){
 	memcpy(_g_config, &config, sizeof(fd_config_t));
@@ -89,6 +96,14 @@ fd_status fd_get_result_sync(int frameid, void* buffer, fd_result_t* result){
 	return exec_eval_pipeline((uint8_t*) buffer, result);
 }
 
+fd_status __fd_get_result_sync( char* fname, fd_result_t* res){
+	food_pos_t* ret = dknet_get_food_pos(fname);
+	if(ret != NULL){
+		memcpy(&(ret[0]), ret, sizeof(food_pos_t));
+		return fd_ok;
+	}
+	return fd_nullptr;
+}
 
 
 fd_status fd_shutdown(){

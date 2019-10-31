@@ -1,0 +1,1 @@
+./openfd_test ignore_me.bmp 416 416 docs/food100.data docs/food100.names docs/yolov2-food100.weights docs/yolov2-food100.cfg

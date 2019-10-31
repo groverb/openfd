@@ -7,15 +7,16 @@
 #include "qdbmp.h"
 #include <string.h>
 #include <stdlib.h>
-
-typedef struct _py_ret_tup{
+typedef struct ret_tup{
 	int category;
 	double confidence;
-} py_ret_tup;
+} ret_tup;
+
+
 
 fd_status init_py_bridge(const char* docpath);
 
-void _py_eval(uint8_t* buff, size_t buff_len, py_ret_tup* ctx );
+void _py_eval(uint8_t* buff, size_t buff_len, ret_tup* ctx );
 
 fd_status free_py_bridge();
 

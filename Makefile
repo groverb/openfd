@@ -27,13 +27,17 @@ sourcedir = $(home)/src/
 
 libopenfd:
 	@echo "building libopenfd"
-	$(cc) $(cflags) -c -I./include/ -I$(home)/src/ -I$(home)/src/3rdparty/qdbmp/ -I /usr/include/python3.6/ $(home)/src/*.c  $(home)/src/3rdparty/qdbmp/qdbmp.c -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m
+	$(cc) $(cflags) -c -I./include/ -I$(home)/src/ -I$(home)/src/3rdparty/qdbmp/ -I$(home)/src/3rdparty/darknet/include/ -I /usr/include/python3.6/ $(home)/src/*.c  $(home)/src/3rdparty/qdbmp/qdbmp.c -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m
 	ar -cr libopenfd.a *.o
-	$(cc) -shared *.o -o libopenfd.so
+	$(cc) -shared *.o -o libopenfd.so -L$(3rdparty_path)/darknet/ -ldarknet 
 	rm -rf *.o
 
+_maint:
+	$(cc) $(cflags) -Wl,-rpath -Wl,./ test.c src/3rdparty/qdbmp/qdbmp.c -I include/ -L./ -lopenfd -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m -o maintest -ldarknet
+
+
 maint:
-	$(cc) $(cflags) -Wl,-rpath -Wl,./ test.c src/3rdparty/qdbmp/qdbmp.c -I include/ -L./ -lopenfd -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m -o maintest
+	$(cc) $(cflags) -Wl,-rpath -Wl,./ detector.c test.c -I include/ -I$(home)/src/3rdparty/darknet/include/ -L./ -o openfd_test -ldarknet -lpthread
 
 clean:
 	rm -rf libopenfd.a

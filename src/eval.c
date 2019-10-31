@@ -68,64 +68,64 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 				else{
 					image_draw_square(ctx, result->fooditems[i].food_pos, topright, &BLUE);
 				}
-				}
-				image_write(ctx, "final.bmp");
+			}
+			image_write(ctx, "final.bmp");
 #endif
 
-				free_list(evaluations);
-				free_list_custom(frames, &free_image, image);
-				free_image(ctx);
+			free_list(evaluations);
+			free_list_custom(frames, &free_image, image);
+			free_image(ctx);
 
-				return fd_ok;
-			}
-		}
-		return fd_nullptr;
-	}
-
-	fd_status prepare_result(list* evaluations, fd_result_t* res){
-		if(evaluations != NULL && res != NULL){
-
-			if(evaluations->size == 0){
-				res->num_fooditems = 0;
-			}
-			else{
-				res->num_fooditems = (evaluations->size < API_MAX_RET_FOOD_COUNT) ? evaluations->size : API_MAX_RET_FOOD_COUNT;
-
-				node* cur = evaluations->HEAD;
-
-				for(int i =0;i<res->num_fooditems; i++){
-					memcpy(&(res->fooditems[i]), (food_pos_t*)(cur->val), sizeof(food_pos_t));
-					cur = cur->next;
-				}
-			}
 			return fd_ok;
 		}
-		return fd_nullptr;
 	}
+	return fd_nullptr;
+}
 
-	food_pos_t* eval(image* ctx){
-		food_pos_t* ret = NULL; 
-		if(ctx != NULL){	
-			uint8_t* ctx_buff = image_to_buffer(ctx);
-			if(ctx_buff !=  NULL){
-				py_ret_tup res;
-				_py_eval(ctx_buff, ctx->dims.x * ctx->dims.y * 3, &res);
+fd_status prepare_result(list* evaluations, fd_result_t* res){
+	if(evaluations != NULL && res != NULL){
 
-				if(res.confidence >= NN_CONFIDENCE_THRESHOLD){
-					ret = malloc(sizeof(food_pos_t));
-					if(ret != NULL){
-						strcpy(ret->food_name, _g_categories_lut[res.category] );
-						ret->food_pos.x = ctx->__relative_pos.x;
-						ret->food_pos.y = ctx->__relative_pos.y;
-						ret->__confidence = res.confidence;
-
-					}
-				}
-				free(ctx_buff);
-			}
-
+		if(evaluations->size == 0){
+			res->num_fooditems = 0;
 		}
-		return ret;
+		else{
+			res->num_fooditems = (evaluations->size < API_MAX_RET_FOOD_COUNT) ? evaluations->size : API_MAX_RET_FOOD_COUNT;
+
+			node* cur = evaluations->HEAD;
+
+			for(int i =0;i<res->num_fooditems; i++){
+				memcpy(&(res->fooditems[i]), (food_pos_t*)(cur->val), sizeof(food_pos_t));
+				cur = cur->next;
+			}
+		}
+		return fd_ok;
 	}
+	return fd_nullptr;
+}
+
+food_pos_t* eval(image* ctx){
+	food_pos_t* ret = NULL; 
+	if(ctx != NULL){	
+		uint8_t* ctx_buff = image_to_buffer(ctx);
+		if(ctx_buff !=  NULL){
+			ret_tup res;
+			_py_eval(ctx_buff, ctx->dims.x * ctx->dims.y * 3, &res);
+
+			if(res.confidence >= NN_CONFIDENCE_THRESHOLD){
+				ret = malloc(sizeof(food_pos_t));
+				if(ret != NULL){
+					strcpy(ret->food_name, _g_categories_lut[res.category] );
+					ret->pos_topright.x = ctx->__relative_pos.x;
+					ret->pos_topright.y = ctx->__relative_pos.y;
+					ret->__confidence = res.confidence;
+
+				}
+			}
+			free(ctx_buff);
+		}
+
+	}
+	return ret;
+}
 
 
