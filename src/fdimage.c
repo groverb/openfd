@@ -126,13 +126,10 @@ fdimage* fdimage_resample(fdimage* ctx, __int2 outdims, pixel (*f)(pixel, pixel)
 	// TODO: user aspect ratio to adjust downsample metrics
 	fdimage* ret = make_fdimage(outdims);
 	size_t mxpt = ctx->dims.x * ctx->dims.y;
-	printf("in here\n");
 	if(ret != NULL){
 		for(int i =0;i<outdims.x- 4;i++){
 			for(int j=0;j< outdims.y -4;j++){
 				int pt = (ctx->dims.x * 2) * i + (j * 2);
-				printf("i: %d, j: %d, pt: %d, indims: %d,%d, outdims: %d,%d ", i, j, pt, ctx->dims.x, ctx->dims.y, outdims.x, outdims.y);
-				printf("%d %d %d %d\n",pt, pt + 1, (pt + ctx->dims.x), (pt + ctx->dims.x + 1 ));
 
 				if((pt + ctx->dims.x + 1 ) > mxpt){
 					goto resample_done;
@@ -151,11 +148,9 @@ resample_done:
 
 
 float* normalize_buffer(uint8_t* buff, size_t len){
-	printf("NORMALZING\n");
 	float min = 0.f, max = 255.f;
 	float* ret = malloc(len * sizeof(float));
 	if(ret != NULL){
-		printf("opposite\n");
 		int c = len-1;
 		for(int i =0; i<len; i++){
 			ret[i] = buff[c--] / max;
@@ -190,9 +185,7 @@ float* to_dknet_buffer(uint8_t* buff, size_t len){
 float* __to_dknet_buffer(fdimage* ctx){
 	char tempfname[500];
 	sprintf(tempfname, "%s/__temp.bmp", _g_config->docpath);
-	printf("trying to write imag\n");	
 	fdimage_write(ctx, tempfname);
-	printf("image written\n");
 	image dknet_image = load_image_color(tempfname, 0, 0);
 	image sized = letterbox_image(dknet_image, DKNET_INPUT_H, DKNET_INPUT_W);
 

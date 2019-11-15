@@ -30,7 +30,6 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 		}	
 		else{
 			frames = sw_get_frames(ctx, windims, SW_STEP_SIZE);
-			printf("slidingwin: %lu frames\n", frames->size);
 		}	
 		fdlist* evaluations= make_fdlist();
 		// parse fdlist
@@ -38,16 +37,13 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 			fdnode* cur = frames->HEAD;
 			do{	
 				// eval each frame
-				printf("jumping to eval\n");
 				food_pos_t* out = eval((fdimage*)(cur->val));
 
 				if(out != NULL){
 					push_back(evaluations, out, 'u');
-					printf("pushing res to list\n");
 				}
 				if(cur->next != NULL){	cur = cur->next;}
 			}	while(cur->next != NULL);
-			printf("evaluations size: %d\n", evaluations->size);
 			assert(prepare_result(evaluations, result) == fd_ok);
 
 			//dbg
@@ -69,7 +65,6 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 					fdimage_draw_square(ctx, result->fooditems[i].pos_bottomleft, result->fooditems[i].pos_topright, &GREEN); 
 				}
 				else{
-					printf("drawing %d, %d to %d, %d\n", result->fooditems[i].pos_bottomleft.x,result->fooditems[i].pos_bottomleft.y,result->fooditems[i].pos_topright.x ,result->fooditems[i].pos_topright.y);
 					
 					
 					fdimage_draw_square(ctx, result->fooditems[i].pos_bottomleft, result->fooditems[i].pos_topright, &BLUE); 
@@ -134,16 +129,13 @@ food_pos_t* eval(fdimage* ctx){
 		}
 #elif DKNET_EVAL
 		int buff_len = ctx->dims.x * ctx->dims.y * 3;
-		printf("normalizing buffer\n");
 
 		float* dknet_buffer = to_dknet_buffer(ctx_buff, buff_len);
 		assert(dknet_buffer != NULL);
 		ret = malloc(sizeof(food_pos_t));
 		if(ret != NULL){
-			printf("jumping to dknet_eval\n");
 
 			assert(dknet_eval(dknet_buffer, ret) ==  fd_ok);	
-			printf("eval ok\n");
 			free(dknet_buffer);
 		}
 #endif

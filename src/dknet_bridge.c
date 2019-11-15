@@ -33,12 +33,10 @@ fd_status init_dknet_bridge(){
 
 static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, food_pos_t* ctx ){
 	int i,j;
-	printf("1 classes: %d, num: %d\n\n", classes , num);
 	for(i = 0; i < num; ++i){
 		char labelstr[4096] = {0};
 		int class = -1;
 		for(j = 0; j < classes; ++j){
-			// printf("in loop: %f\n", dets[i].prob[j]);
 			if (dets[i].prob[j] > DKNET_THRESHOLD){
 				if (class < 0) {
 					strcat(labelstr, names[j]);
@@ -48,14 +46,12 @@ static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, f
 					strcat(labelstr, names[j]);
 				}
 #if dbgl1
-				printf("here\n");
 				printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
 #endif
 
 			}
 		}
 		if(class >= 0){
-	printf("2\n");
 			box b = dets[i].bbox;
 
 			int left  = (b.x-b.w/2.)*DKNET_INPUT_W;
@@ -71,7 +67,6 @@ static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, f
 			if(top < 0) top = 0;
 			if(bot > DKNET_INPUT_H-1) bot = DKNET_INPUT_H-1;
 	*/
-	printf("3\n");
 
 			if(ctx != NULL){
 				ctx->pos_topright.x = bot;
@@ -81,7 +76,6 @@ static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, f
 				ctx->pos_bottomleft.y = top;
 
 				strcpy(ctx->food_name, labelstr); 
-				printf("4\n");
 				return fd_ok;
 			}
 			else {
@@ -98,11 +92,9 @@ static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, f
 fd_status dknet_eval(float* buffer, food_pos_t* foodpos){
 
 	layer l = _net->layers[_net->n-1];
-	printf("jumping to network_predict\n");
 	__int2 _indims = {416, 416};
 	__dknetbuffer_to_fdimage(buffer, _indims);
 	
-	printf("writing dknet input\n");
 	image dknetimg = make_image(416, 416,3);
 	size_t bufflen = sizeof(float) * 416 * 416 * 3;
 
@@ -112,12 +104,10 @@ fd_status dknet_eval(float* buffer, food_pos_t* foodpos){
 	save_image(dknetimg, "dknet_inp.jpg");
 
 	network_predict(_net, buffer);
-	printf("outta net pred\n");
 
 	int nboxes = 0;
 	detection *dets = get_network_boxes(_net, DKNET_INPUT_W, DKNET_INPUT_H, DKNET_THRESHOLD, DKNET_HIER_THRESHOLD, 0, 1, &nboxes);
 	
-	printf("getting outa dknet_eval\n");
 	return dknet_prepare_food_pos(dets, l.classes, nboxes, foodpos);
 
 }

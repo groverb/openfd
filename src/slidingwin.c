@@ -78,30 +78,3 @@ sw_done:
 
 }
 
-#if 0
-// test
-int main(int argc, char** argv){
-
-	BMP* inp = BMP_ReadFile(argv[1]);
-	__int2 inpdims = {.x = BMP_GetWidth(inp), .y = BMP_GetHeight(inp)};
-
-	fdimage* img1 = buffer_to_fdimage(inp->Data, inpdims); // make_fdimage(inp->Data, inpdims);
-	__int2 offset = {.x = 10, .y = 0};
-	__int2 windims = {atoi(argv[3]), atoi(argv[3])};
-
-	fdimage* win = create_window(img1, windims, offset);
-
-	fdimage_write(win,argv[2]);
-
-	fdlist* frames = sw_get_frames(img1, windims, 30);
-	printf("finished with %ld frames\n", frames->size);
-
-	foreach_frame(frames);
-
-	free_fdlist(frames);
-	free(img1);
-	return 0;
-}
-
-#endif
-
