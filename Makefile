@@ -20,16 +20,16 @@ E = @echo
 # includepath = $(foreach dir, $(dirs), -I $(dir) )
 includedir = $(home)/include/
 sourcedir = $(home)/src/
-
+3rdparty_path := $(home)/src/3rdparty
 
 %.c: 
 	@echo "CC	" $<
 
 libopenfd:
 	@echo "building libopenfd"
-	$(cc) $(cflags) -c -I./include/ -I$(home)/src/ -I$(home)/src/3rdparty/qdbmp/ -I$(home)/src/3rdparty/darknet/include/ -I /usr/include/python3.6/ $(home)/src/*.c  $(home)/src/3rdparty/qdbmp/qdbmp.c -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m
+	$(cc) $(cflags) -c -I./include/ -I$(home)/src/ -I$(home)/src/3rdparty/qdbmp/ -I$(home)/src/3rdparty/darknet/include/ -I /usr/include/python3.6/ $(home)/src/*.c  $(home)/src/3rdparty/qdbmp/qdbmp.c -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m  
 	ar -cr libopenfd.a *.o
-	$(cc) -shared *.o -o libopenfd.so -L$(3rdparty_path)/darknet/ -ldarknet 
+	$(cc) -shared *.o -o libopenfd.so $(3rdparty_path)/darknet/libdarknet.a
 	rm -rf *.o
 
 _maint:
@@ -46,3 +46,10 @@ clean:
 tests:
 	@echo "building for $(os)"
 	$(cc) $(cflags) -I $(includedir) $(sourcedir)/preprocessor/downsample.c $(sourcedir)/3rdparty/qdbmp.c test.c -o bin/test
+
+newt:
+	gcc -Wl,-rpath -Wl,./ newtest.c -o newtest -Iinclude/ -L./ -lopenfd  -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m -lpthread -lm
+	
+
+
+# -Wl,-rpath -Wl,$(3rdparty_path)/darknet/ 

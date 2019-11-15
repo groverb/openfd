@@ -2,10 +2,10 @@
 #define _SLIDING_WINDOW_H
 
 #include <fd/fd_types.h>
-#include "image.h"
-#include "linked_list.h"
+#include "fdimage.h"
+#include "fdlist.h"
 
-list* sw_get_frames(image* ctx, __int2 windims, int step);
+fdlist* sw_get_frames(fdimage* ctx, __int2 windims, int step);
 
 #endif
 

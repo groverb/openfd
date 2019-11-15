@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "config.h"
-#include "image.h"
+#include "fdimage.h"
 
 static PyObject* pname = NULL;
 static PyObject* pmodule = NULL;
@@ -17,13 +17,13 @@ static PyObject* pmain_func = NULL, *pinit_func = NULL;
 static PyObject* pargs = NULL;
 static PyObject* pvalue = NULL;
 
-static PyObject* atoplist(uint8_t* buff, size_t buff_len){
-	PyObject* ret_list = PyList_New((int)buff_len);
-	if(ret_list == NULL){ printf("couldnt make list\n"); exit(-1); }
+static PyObject* atopfdlist(uint8_t* buff, size_t buff_len){
+	PyObject* ret_fdlist = PyList_New((int)buff_len);
+	if(ret_fdlist == NULL){ printf("couldnt make fdlist\n"); exit(-1); }
 	for(int i = 0;i< (int)buff_len;i++){
-		PyList_SetItem(ret_list, i, PyFloat_FromDouble((double)(buff[i])));
+		PyList_SetItem(ret_fdlist, i, PyFloat_FromDouble((double)(buff[i])));
 	}
-	return ret_list;
+	return ret_fdlist;
 }
 
 fd_status init_py_bridge(const char* docpath){
@@ -75,7 +75,7 @@ void _py_eval(uint8_t* buff, size_t buff_len, ret_tup* ctx){
 		if (pmain_func && PyCallable_Check(pinit_func)) {
 			pargs = PyTuple_New(1);
 
-			PyTuple_SetItem(pargs, 0, atoplist(buff, buff_len));
+			PyTuple_SetItem(pargs, 0, atopfdlist(buff, buff_len));
 
 			pvalue = PyObject_CallObject(pmain_func, pargs );
 
@@ -110,33 +110,4 @@ fd_status free_py_bridge(){
 	return fd_ok;
 
 }
-
-#if 0 
-int main(int argc, char** argv){
-	printf("opening %s\n", argv[2]);
-
-	// BMP* cbmp = BMP_ReadFile(argv[2]);
-
-	assert(init_py_bridge(argv[1]) == fd_ok);
-	int catsz = 101;
-
-	char* categories[101]; //  = malloc(sizeof(char) * catsz);
-	load_categories(argv[3], categories, catsz);
-
-	// printf("h: %lu, w: %lu\n", BMP_GetHeight(cbmp), BMP_GetWidth(cbmp));
-	printf("HERE\n");
-	// 	printf("predicted category: %s\n", categories[eval(cbmp->Data,  64 * 64 * 3)]) ;
-	// atoplist(cbmp->Data, 64 * 64 * 3);
-	printf("done \n");
-
-	for(int i =0;i<catsz; i++){
-		free(categories[i]);
-	}
-
-	// free_py_bridge();	
-
-	return 0;
-}
-
-#endif
 

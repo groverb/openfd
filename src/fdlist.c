@@ -1,38 +1,38 @@
-#include "linked_list.h"
+#include "fdlist.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-list* make_list(){
-	list* l = malloc(sizeof(list));
+fdlist* make_fdlist(){
+	fdlist* l = malloc(sizeof(fdlist));
 	l->HEAD = l->TAIL = NULL;
 	l->size = 0;
 	return l;
 }
 
-int push_front(list* l, void* val, char type){
+int push_front(fdlist* l, void* val, char type){
 	if(val == NULL) return 0;
-	node* new_node = (node*) malloc(sizeof(node));
-	if(new_node == NULL || l == NULL){
+	fdnode* new_fdnode = (fdnode*) malloc(sizeof(fdnode));
+	if(new_fdnode == NULL || l == NULL){
 		return 0;
 	}
-	new_node->val = val;
-	new_node->type = type;
-	node* cur_h = l->HEAD;
-	new_node->next = cur_h;
-	l->HEAD = new_node;
+	new_fdnode->val = val;
+	new_fdnode->type = type;
+	fdnode* cur_h = l->HEAD;
+	new_fdnode->next = cur_h;
+	l->HEAD = new_fdnode;
 	l->size++;
 	return 1;
 }
 
-const node* list_head(list* l){
+const fdnode* fdlist_head(fdlist* l){
 	return l->HEAD;
 }
 
-int pop_front(list* l){
+int pop_front(fdlist* l){
 	if(l == NULL) return 0;
-	node* cur_h = l->HEAD;
+	fdnode* cur_h = l->HEAD;
 	l->HEAD = l->HEAD->next;
 	free(cur_h->val);
 	free(cur_h);
@@ -40,52 +40,52 @@ int pop_front(list* l){
 	return 1;
 }
 
-int __push_back(list* l, void* val, char type){
+int __push_back(fdlist* l, void* val, char type){
 	if(val == NULL) return 0;
-	node* new_node = (node*) malloc(sizeof(node));
-	if(new_node != NULL){
-		new_node->val = val;
-		new_node->type = type;
-		new_node->next = NULL;
+	fdnode* new_fdnode = (fdnode*) malloc(sizeof(fdnode));
+	if(new_fdnode != NULL){
+		new_fdnode->val = val;
+		new_fdnode->type = type;
+		new_fdnode->next = NULL;
 		if(l->HEAD == NULL){
-			l->HEAD = new_node;
+			l->HEAD = new_fdnode;
 			return 1;
 		}
-		node* cur = l->HEAD;
+		fdnode* cur = l->HEAD;
 		while(cur->next != NULL){
 			cur = cur->next;
 		}
-		cur->next = new_node;
-		l->TAIL = new_node;
+		cur->next = new_fdnode;
+		l->TAIL = new_fdnode;
 		l->size++;
 		return 1;
 	}
 	return 0;
 }
 
-int push_back(list* l, void* val, char type){
-	node* new_node = malloc(sizeof(node));
-	if(new_node != NULL){
-		new_node->next = NULL;
-		new_node->val = val;
-		new_node->type = type;
+int push_back(fdlist* l, void* val, char type){
+	fdnode* new_fdnode = malloc(sizeof(fdnode));
+	if(new_fdnode != NULL){
+		new_fdnode->next = NULL;
+		new_fdnode->val = val;
+		new_fdnode->type = type;
 		l->size++;
-		if(l->HEAD == NULL && l->TAIL == NULL){ l->TAIL = l->HEAD = new_node; return 1; }
+		if(l->HEAD == NULL && l->TAIL == NULL){ l->TAIL = l->HEAD = new_fdnode; return 1; }
 
-		new_node->prev = l->TAIL;
-		l->TAIL->next = new_node;
+		new_fdnode->prev = l->TAIL;
+		l->TAIL->next = new_fdnode;
 		l->TAIL = l->TAIL->next;
 		return 1;
 	}
 
 	return 0;
 }
-int __pop_back(list* l){
+int __pop_back(fdlist* l){
 	if(l != NULL){
-		node* cur = l->HEAD;
+		fdnode* cur = l->HEAD;
 		if(cur == NULL) { return 1 ; }
 		if(cur->next == NULL) { free(cur->val); free(cur); l->HEAD = NULL; return 1; }
-		node* cur_n = cur->next;
+		fdnode* cur_n = cur->next;
 		while(cur_n->next != NULL){
 			cur = cur->next;
 			cur_n = cur->next;
@@ -99,13 +99,13 @@ int __pop_back(list* l){
 	return 0;
 }
 
-int pop_back(list* l){
+int pop_back(fdlist* l){
 	if(l->TAIL != NULL){
 		if(l->HEAD->next == NULL && l->TAIL->prev == NULL) {
 			free(l->HEAD->val); free(l->HEAD); l->HEAD = l->TAIL = NULL;
 			return 1;
 		}
-		node* tbf = l->TAIL;
+		fdnode* tbf = l->TAIL;
 		l->TAIL = l->TAIL->prev;
 
 		free(tbf->val);
@@ -118,9 +118,9 @@ int pop_back(list* l){
 	return 0;
 }
 
-void list_foreach(list* l, void (*f)(void*)){
+void fdlist_foreach(fdlist* l, void (*f)(void*)){
 	if(l != NULL){
-		node* cur = l->HEAD;
+		fdnode* cur = l->HEAD;
 		while(cur != NULL){
 			f(cur);
 			cur = cur->next;
@@ -128,9 +128,9 @@ void list_foreach(list* l, void (*f)(void*)){
 	}
 
 }
-void print_ch_list(list* l){
+void print_ch_fdlist(fdlist* l){
 	if(l != NULL){
-		node* cur = l->HEAD;
+		fdnode* cur = l->HEAD;
 		while(cur != NULL){
 			printf("%s\n",(char*) cur->val);
 			cur = cur->next;
@@ -138,9 +138,9 @@ void print_ch_list(list* l){
 	}
 }
 
-node* get(list* l, int index){
+fdnode* get(fdlist* l, int index){
 	int ind = 0;
-	node* cur_n = l->HEAD;
+	fdnode* cur_n = l->HEAD;
 	if(cur_n != NULL){
 		while(cur_n->next != NULL){
 			if(ind == index) return cur_n;
@@ -151,14 +151,14 @@ node* get(list* l, int index){
 	return NULL;
 }
 
-size_t size(list* l){
+size_t size(fdlist* l){
 	return l->size;
 }
 
 
-void print_list(list* l){
+void print_fdlist(fdlist* l){
 	if(l != NULL){
-		node* cur = l->HEAD;
+		fdnode* cur = l->HEAD;
 		while(cur != NULL){
 			switch(cur->type){
 				case 'd':
@@ -184,8 +184,8 @@ void print_list(list* l){
 }
 
 
-size_t free_list(list* l){
-	node* temp;
+size_t free_fdlist(fdlist* l){
+	fdnode* temp;
 	while(l->HEAD != NULL){
 		temp = l->HEAD;
 		l->HEAD = l->HEAD->next;

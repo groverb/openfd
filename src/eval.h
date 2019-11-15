@@ -3,16 +3,16 @@
 
 #include <stdint.h>
 #include <fd/fd_types.h>
-#include "image.h"
-#include "linked_list.h"
+#include "fdimage.h"
+#include "fdlist.h"
 
 
 
 fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result);
 
-fd_status prepare_result(list* evaluations, fd_result_t* res);
+fd_status prepare_result(fdlist* evaluations, fd_result_t* res);
 
-food_pos_t* eval(image* ctx);
+food_pos_t* eval(fdimage* ctx);
 
 #endif
 

@@ -5,20 +5,20 @@
 #include "slidingwin.h"
 
 #include "qdbmp.h"
-#include "linked_list.h"
+#include "fdlist.h"
 
 
-static int get_fc(image* ctx, __int2 windims){
+static int get_fc(fdimage* ctx, __int2 windims){
 	return (1 + (ctx->dims.x - windims.x) * (1 + (ctx->dims.y - windims.y)));
 }
 
-static image* create_window(image* ctx, __int2 windims, __int2 offset){
+static fdimage* create_window(fdimage* ctx, __int2 windims, __int2 offset){
 
 	__int2 end = {offset.x + SW_WINDIMS_X, offset.y + SW_WINDIMS_Y};
 
 	int startpt = offset.x * ctx->dims.x + offset.y;
 	int endpt = (end.x * (ctx->dims.x) + end.y) -1;
-	image* ret = make_image(windims);
+	fdimage* ret = make_fdimage(windims);
 	memcpy(&(ret->__relative_pos), &offset, sizeof(__int2));
 
 	int c = 0, acp = 0;
@@ -37,20 +37,20 @@ static image* create_window(image* ctx, __int2 windims, __int2 offset){
 	static int __idk = 0;
 	char fpath[30];
 	sprintf(fpath, "bmpo/%d.bmp", __idk++);
-	image_write(ret, fpath);
+	fdimage_write(ret, fpath);
 #endif
 	return ret;
 }
 
 
-list* sw_get_frames(image* ctx, __int2 windims, int step){
-	list* ret = make_list();
+fdlist* sw_get_frames(fdimage* ctx, __int2 windims, int step){
+	fdlist* ret = make_fdlist();
 
 	int fc = get_fc(ctx, windims);
 	if(fc == 1){
-		image* ctx_cp = image_cp(ctx);
+		fdimage* ctx_cp = fdimage_cp(ctx);
 
-		if(ctx_cp == NULL){ printf("image_cp() returned null\n"); }
+		if(ctx_cp == NULL){ printf("fdimage_cp() returned null\n"); }
 		push_back(ret, ctx_cp, 'u');
 	}
 	else{
@@ -72,7 +72,7 @@ list* sw_get_frames(image* ctx, __int2 windims, int step){
 	}
 sw_done:
 #if dbgl2
-	image_write(ctx, "swdone.bmp");
+	fdimage_write(ctx, "swdone.bmp");
 #endif
 	return ret;
 
@@ -85,20 +85,20 @@ int main(int argc, char** argv){
 	BMP* inp = BMP_ReadFile(argv[1]);
 	__int2 inpdims = {.x = BMP_GetWidth(inp), .y = BMP_GetHeight(inp)};
 
-	image* img1 = buffer_to_image(inp->Data, inpdims); // make_image(inp->Data, inpdims);
+	fdimage* img1 = buffer_to_fdimage(inp->Data, inpdims); // make_fdimage(inp->Data, inpdims);
 	__int2 offset = {.x = 10, .y = 0};
 	__int2 windims = {atoi(argv[3]), atoi(argv[3])};
 
-	image* win = create_window(img1, windims, offset);
+	fdimage* win = create_window(img1, windims, offset);
 
-	image_write(win,argv[2]);
+	fdimage_write(win,argv[2]);
 
-	list* frames = sw_get_frames(img1, windims, 30);
+	fdlist* frames = sw_get_frames(img1, windims, 30);
 	printf("finished with %ld frames\n", frames->size);
 
 	foreach_frame(frames);
 
-	free_list(frames);
+	free_fdlist(frames);
 	free(img1);
 	return 0;
 }
