@@ -45,7 +45,6 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 				if(cur->next != NULL){	cur = cur->next;}
 			}	while(cur->next != NULL);
 			assert(prepare_result(evaluations, result) == fd_ok);
-
 			//dbg
 #if dbgl1
 			pixel GREEN = {0, 255, 0};
@@ -87,6 +86,7 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 
 fd_status prepare_result(fdlist* evaluations, fd_result_t* res){
 	if(evaluations != NULL && res != NULL){
+		printf("evaluations size: %d\n", evaluations->size);
 
 		if(evaluations->size == 0){
 			res->num_fooditems = 0;
@@ -98,7 +98,7 @@ fd_status prepare_result(fdlist* evaluations, fd_result_t* res){
 
 			for(int i =0;i<res->num_fooditems; i++){
 				memcpy(&(res->fooditems[i]), (food_pos_t*)(cur->val), sizeof(food_pos_t));
-				cur = cur->next;
+				if(cur->next != NULL) { cur = cur->next; }
 			}
 		}
 		return fd_ok;
@@ -135,7 +135,11 @@ food_pos_t* eval(fdimage* ctx){
 		ret = malloc(sizeof(food_pos_t));
 		if(ret != NULL){
 
-			assert(dknet_eval(dknet_buffer, ret) ==  fd_ok);	
+			if(dknet_eval(dknet_buffer, ret) ==  fd_nofood){
+				printf("no food\n");
+				free(ret);
+				return NULL;
+			}
 			free(dknet_buffer);
 		}
 #endif

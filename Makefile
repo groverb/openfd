@@ -29,7 +29,7 @@ libopenfd:
 	@echo "building libopenfd"
 	$(cc) $(cflags) -c -I./include/ -I$(home)/src/ -I$(home)/src/3rdparty/qdbmp/ -I$(home)/src/3rdparty/darknet/include/ -I /usr/include/python3.6/ $(home)/src/*.c  $(home)/src/3rdparty/qdbmp/qdbmp.c -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m  
 	ar -cr libopenfd.a *.o
-	$(cc) -shared *.o -o libopenfd.so $(3rdparty_path)/darknet/libdarknet.a
+	$(cc) -shared *.o -o libopenfd.so $(3rdparty_path)/darknet/libdarknet.a -lm -lpthread
 	rm -rf *.o
 
 _maint:

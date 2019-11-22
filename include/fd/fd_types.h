@@ -4,6 +4,7 @@
 // ---------- config
 #define PYTHON_EVAL 0
 #define DKNET_EVAL	1
+#define PYTHON_SERVER 1
 
 #define API_MAX_RET_FOOD_COUNT 80 
 
@@ -62,7 +63,8 @@ typedef enum _fd_status{
 	fd_notinitialized,
 	fd_invalidargs,
 	fd_accessviolation,
-	fd_filenotfound
+	fd_filenotfound,
+	fd_nofood
 } fd_status;
 
 typedef enum _buffer_format{

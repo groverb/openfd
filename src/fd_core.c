@@ -44,14 +44,16 @@ fd_status fd_init(fd_config_t config){
 
 	_g_config = malloc(sizeof(fd_config_t));
 	memcpy(_g_config, &config, sizeof(fd_config_t));
-#if PYTHON_EVAL
+
 #ifdef PYTHON_SERVER
 	char* external_docpath = getenv("PYTHON_SERVER_PATH");
 	if(external_docpath != NULL){
 		strcpy(_g_config->docpath, external_docpath );
 	}
+	printf("py server at init: %d, %d, %s", _g_config->indims.x, _g_config->indims.y, _g_config->docpath);
 #endif
 
+#if PYTHON_EVAL
 	assert(load_categories() == fd_ok);
 	return init_py_bridge(_g_config->docpath);
 
@@ -111,7 +113,10 @@ fd_status __fd_get_result_sync( char* fname, fd_result_t* res){
 */
 
 fd_status fd_shutdown(){
+#ifdef PYTHON_EVAL
 	assert(free_py_bridge() == fd_ok);
+#endif
+
 	if(_g_config != NULL && _doneq != NULL && _waitq != NULL){
 		free(_g_config);
 		_g_config = NULL;

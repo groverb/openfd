@@ -83,7 +83,7 @@ static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, f
 			}
 		}
 	}
-	return fd_failed;
+	return fd_nofood;
 }
 
 
