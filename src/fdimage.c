@@ -148,7 +148,7 @@ resample_done:
 
 
 float* normalize_buffer(uint8_t* buff, size_t len){
-	float min = 0.f, max = 255.f;
+	float max = 255.f;
 	float* ret = malloc(len * sizeof(float));
 	if(ret != NULL){
 		int c = len-1;
@@ -205,12 +205,8 @@ void __dknetbuffer_to_fdimage(float* buffer, __int2 indims){
 
 
 	uint8_t* im_buff = malloc(sizeof(uint8_t) * indims.x * indims.y * 3);
-	size_t sz = indims.x * indims.y * 3;
-	int c =sz-1;
-
+	
 	if(im_buff){
-
-
 		int i,k, l;
 		for(k = 0; k < 3; ++k){
 			for(i = 0, l = (416 * 416 )-1; i < 416 * 416; ++i, l--){

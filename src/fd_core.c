@@ -50,7 +50,6 @@ fd_status fd_init(fd_config_t config){
 	if(external_docpath != NULL){
 		strcpy(_g_config->docpath, external_docpath );
 	}
-	printf("py server at init: %d, %d, %s", _g_config->indims.x, _g_config->indims.y, _g_config->docpath);
 #endif
 
 #if PYTHON_EVAL

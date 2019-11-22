@@ -86,7 +86,6 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 
 fd_status prepare_result(fdlist* evaluations, fd_result_t* res){
 	if(evaluations != NULL && res != NULL){
-		printf("evaluations size: %d\n", evaluations->size);
 
 		if(evaluations->size == 0){
 			res->num_fooditems = 0;
@@ -136,7 +135,6 @@ food_pos_t* eval(fdimage* ctx){
 		if(ret != NULL){
 
 			if(dknet_eval(dknet_buffer, ret) ==  fd_nofood){
-				printf("no food\n");
 				free(ret);
 				return NULL;
 			}
