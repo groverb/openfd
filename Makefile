@@ -1,55 +1,62 @@
-home = $(shell pwd)
-os = $(shell uname)
+HOME = $(shell pwd)
 
 
-ifeq ($(os), Darwin)
-	cc = clang
-endif
+CC = gcc
+CFLAGS = -std=c11 -Wall -fPIC
+ 
+SRC=dknet_bridge.c eval.c fd_core.c fdimage.c fdlist.c py_bridge.c slidingwin.c
+OBJ=dknet_bridge.o eval.o fd_core.o fdimage.o fdlist.o py_bridge.o slidingwin.o
+SLIB = libopenfd.so
+ALIB = libopenfd.a
 
-ifeq ($(os), Linux)
-		cc = gcc
-endif
+SRCDIR = $(HOME)/src/
+INCLUDEDIR = $(HOME)/include/
+3RDPARTYDIR=$(HOME)/src/3rdparty
 
-
-cflags = -g -Wall -fPIC
-
-dirs = preprocessor
-
-E = @echo
-
-# includepath = $(foreach dir, $(dirs), -I $(dir) )
-includedir = $(home)/include/
-sourcedir = $(home)/src/
-3rdparty_path := $(home)/src/3rdparty
-
-%.c: 
-	@echo "CC	" $<
-
-libopenfd:
-	@echo "building libopenfd"
-	$(cc) $(cflags) -c -I./include/ -I$(home)/src/ -I$(home)/src/3rdparty/qdbmp/ -I$(home)/src/3rdparty/darknet/include/ -I /usr/include/python3.6/ $(home)/src/*.c  $(home)/src/3rdparty/qdbmp/qdbmp.c -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m  
-	ar -cr libopenfd.a *.o
-	$(cc) -shared *.o -o libopenfd.so $(3rdparty_path)/darknet/libdarknet.a -lm -lpthread
-	rm -rf *.o
-
-_maint:
-	$(cc) $(cflags) -Wl,-rpath -Wl,./ test.c src/3rdparty/qdbmp/qdbmp.c -I include/ -L./ -lopenfd -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m -o maintest -ldarknet
+AR=ar rcs
+INCLUDEFLAGS= -I$(INCLUDEDIR) -I$(SRCDIR) -I$(3RDPARTYDIR)/darknet/include/  -I$(3RDPARTYDIR)/qdbmp -I/usr/include/python3.6/
+LDSEARCHFLAGS = -L$(HOME)/ -L$(3RDPARTYDIR)/darknet/ -L$(3RDPARTYDIR)/qdbmp/ 
+LDFLAGS= -lqdbmp -ldarknet -lpython3.6m
+LDRPATHFLAGS = -Wl,-rpath -Wl,$(HOME) -Wl,-rpath -Wl,$(3RDPARTYDIR)/darknet  -Wl,-rpath -Wl,$(3RDPARTYDIR)/qdbmp/
 
 
-maint:
-	$(cc) $(cflags) -Wl,-rpath -Wl,./ detector.c test.c -I include/ -I$(home)/src/3rdparty/darknet/include/ -L./ -o openfd_test -ldarknet -lpthread
+_OBJ = $(addprefix $(SRCDIR), $(OBJ))
+_SRC = $(addprefix $(SRCDIR), $(SRC))
 
-clean:
-	rm -rf libopenfd.a
-	rm -rf libopenfd.so
+darknet: 
+	@cd $(3RDPARTYDIR)/darknet/ && $(MAKE) 
 
-tests:
-	@echo "building for $(os)"
-	$(cc) $(cflags) -I $(includedir) $(sourcedir)/preprocessor/downsample.c $(sourcedir)/3rdparty/qdbmp.c test.c -o bin/test
+qdbmp: 
+	@cd $(3RDPARTYDIR)/qdbmp/ && $(MAKE) 
 
-newt:
-	gcc -Wl,-rpath -Wl,./ newtest.c -o newtest -Iinclude/ -L./ -lopenfd  -L/usr/lib/ -L/usr/lib/x86_64-linux-gnu/ -lpython3.6m -lpthread -lm
-	
+THIRD_PARTY = darknet qdbmp
+THIRD_PARTY_LIBS= libdarknet.so libqdbmp.so libpython3.6m.so
 
 
-# -Wl,-rpath -Wl,$(3rdparty_path)/darknet/ 
+%.o: %.c
+	@echo "CC	$@"
+	@$(CC) $(CFLAGS) -c $(INCLUDEFLAGS) $< -o $@ 
+
+$(SLIB): darknet qdbmp $(_OBJ) 
+	@echo "LINK	$(SLIB) $(THIRD_PARTY_LIBS)" 
+	@$(CC) -shared -fPIC -o $@ $(_OBJ) $(LDRPATHFLAGS) $(LDSEARCHFLAGS) $(LDFLAGS)
+
+$(ALIB): $(_OBJ)
+	@echo "AR	$@"
+	@$(AR) $@ $^
+
+
+all: $(SLIB) $(ALIB)
+
+clean_3rdparty:	
+	@cd $(3RDPARTYDIR)/qdbmp/ && $(MAKE) clean 
+	@cd $(3RDPARTYDIR)/darknet/ && $(MAKE) clean 
+
+clean: clean_3rdparty 
+	rm -rf $(_OBJ) 
+	rm -rf $(SLIB)
+	rm -rf $(ALIB)
+
+
+.DEFAULT_GOAL := all
+
