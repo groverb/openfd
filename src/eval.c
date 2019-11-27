@@ -48,38 +48,28 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 			//dbg
 #if dbgl1
 			pixel GREEN = {0, 255, 0};
-			pixel RED = {255, 0, 0};
-			pixel BLUE = {0, 0, 255};
-
+			int stroke = 3;
+			__int2 temp_bottomleft, temp_topright; 
 
 			for(int i =0;i<result->num_fooditems;i++){
-				// __int2 topright = {result->fooditems[i].pos_topright.x + 64 , result->fooditems[i].pos_topright.y + 64};
+				temp_bottomleft = result->fooditems[i].pos_bottomleft; 
+				temp_topright = result->fooditems[i].pos_topright;
 
-				if(strcmp(result->fooditems[i].food_name, "sashimi")== 0){
-
-					fdimage_draw_square(ctx, result->fooditems[i].pos_bottomleft, result->fooditems[i].pos_topright, &RED); 
-				}
-
-				if(strcmp(result->fooditems[i].food_name, "donuts") == 0){
-					fdimage_draw_square(ctx, result->fooditems[i].pos_bottomleft, result->fooditems[i].pos_topright, &GREEN); 
-				}
-				else{
-					
-					
-					fdimage_draw_square(ctx, result->fooditems[i].pos_bottomleft, result->fooditems[i].pos_topright, &BLUE); 
-					fdimage_draw_point(ctx,  result->fooditems[i].pos_topright, &GREEN); 
-					fdimage_draw_point(ctx,  result->fooditems[i].pos_bottomleft, &BLUE); 
+				for(int j = 0; j< stroke; j++){
+					__int2 bbox_bleft = {.x = temp_bottomleft.x + j, .y =  temp_bottomleft.y + j};
+					__int2 bbox_tright= {.x = temp_topright.x + j, .y= temp_topright.y + j};
+					fdimage_draw_square(ctx,bbox_bleft, bbox_tright,  &GREEN); 
 				}
 			}
-			fdimage_write(ctx, "final.bmp");
+		}
+		fdimage_write(ctx, "final.bmp");
 #endif
 
-			free_fdlist(evaluations);
-			free_fdlist_custom(frames, &free_fdimage, fdimage);
-			free_fdimage(ctx);
+		free_fdlist(evaluations);
+		free_fdlist_custom(frames, &free_fdimage, fdimage);
+		free_fdimage(ctx);
 
-			return fd_ok;
-		}
+		return fd_ok;
 	}
 	return fd_nullptr;
 }

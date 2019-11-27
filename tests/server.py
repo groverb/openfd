@@ -37,6 +37,8 @@ FOOD_POS_T._fields_ = ("food_name", c_char * 100), ("pos_topright", INT2), ("pos
 FD_RESULT_T._fields_ = ("frame_id", c_int), ("timestamp", c_double), ("num_fooditems", c_int), ("fooditems", FOOD_POS_T * 80)
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin 
+
 import requests
 
 from io import BytesIO
@@ -46,6 +48,11 @@ import json
 from PIL import Image
 
 _g_res = FD_RESULT_T()
+
+
+def is_valid_url(path):
+    r = requests.head(path)
+    return r.status_code == requests.codes.ok
 
 
 def get_py_buff(im):
@@ -86,7 +93,7 @@ def fd_make_json(fd_res):
 
 	for i in range(0,fd_res.num_fooditems):
 		j = fd_res.fooditems[i]
-		retj = retj + "{\"food_name\":\"" + str(j.food_name, "utf-8")+ "\",\"pos_topright\":{\"x\":" + str(j.pos_topright.x) + ",\"y\":" + str(j.pos_topright.y) + "}," + ",\"pos_bottomleft\":{\"x\":" + str(j.pos_bottomleft.x) + ",\"y\":" + str(j.pos_bottomleft.y) + "},\"confidence\": " + str(j.__confidence) + "}"
+		retj = retj + "{\"food_name\":\"" + str(j.food_name, "utf-8")+ "\",\"pos_topright\":{\"x\":" + str(j.pos_topright.x) + ",\"y\":" + str(j.pos_topright.y) + "}" + ",\"pos_bottomleft\":{\"x\":" + str(j.pos_bottomleft.x) + ",\"y\":" + str(j.pos_bottomleft.y) + "},\"confidence\": " + str(j.__confidence) + "}"
 		if i != fd_res.num_fooditems-1:
 			retj = retj + ","
 	
@@ -94,26 +101,29 @@ def fd_make_json(fd_res):
 	return retj
 
 def run_openfd(url):
-	url_res = requests.get(url)
-	img = Image.open(BytesIO(url_res.content))
-	pybuff = get_py_buff(img)  # py list 
-	sz = 416 * 416 * 3
+	try:
+		url_res = requests.get(url)
+		img = Image.open(BytesIO(url_res.content))
+		pybuff = get_py_buff(img)  # py list 
+		sz = 416 * 416 * 3
 
-	carr = (c_ubyte * sz)(*pybuff)
-	buffptr = cast(carr, c_void_p)
+		carr = (c_ubyte * sz)(*pybuff)
+		buffptr = cast(carr, c_void_p)
 
-	frameid = 0
-	# res = FD_RESULT_T()
-	global _g_res
-	openfd.fd_get_result_sync(c_int(frameid), buffptr, addressof(_g_res))
-	print("received num food items: ")
-	print(_g_res.num_fooditems)
-	jsonout = fd_make_json(_g_res)
-	return jsonout
-
+		frameid = 0
+		# res = FD_RESULT_T()
+		global _g_res
+		openfd.fd_get_result_sync(c_int(frameid), buffptr, addressof(_g_res))
+		print("received num food items: ")
+		print(_g_res.num_fooditems)
+		jsonout = fd_make_json(_g_res)
+		return jsonout
+	except:
+		return None
 
 app = Flask(__name__)
-
+app.config['CORS_HEADERS'] = "Content-Type"
+cors = CORS(app, resources={r"/evaluate/": {"origins": "*"}}) # "http://127.0.0.1:5000"}})
 
 @app.route("/")
 def home():
@@ -121,13 +131,21 @@ def home():
 
 @app.route("/evaluate/", methods=['POST'] )
 def evaluate():
-	print("url received: ")
+	print("form received: ")
+	print(request.form.to_dict())
+	ctx_url = request.form.get("url")
+	print("url: ")
+	print(ctx_url)
+	#if is_valid_url(ctx_url):
 	jsonres = run_openfd(request.form.get("url"))
-	return jsonres, 200, {'Content-Type':"application/json" }
+	if jsonres == None:
+		err_res = "{\"error\": \"invalid_url\"}"		
+		return err_res , 400, {'Content-Type':"application/json" }
+	return jsonres, 200, {'Content-Type':"application/json", "Access-Control-Allow-Origin": "*" }
 	# run_openfd(url)
-
-
-
+	#else:
+	#	err_res = "{\"error\": \"invalid_url\"}"		
+	#return err_res , 400, {'Content-Type':"application/json" }
 
 
 if __name__ == "__main__":

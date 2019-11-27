@@ -3,6 +3,10 @@
 #include "config.h"
 
 #include <math.h>
+
+#define IMAX(x,y) ((x)>(y))?(x):(y)
+#define IMIN(x,y) ((x)<(y))?(x):(y)
+
 extern void __dknetbuffer_to_fdimage(float*, __int2);
 
 static network* _net = NULL; 
@@ -33,6 +37,7 @@ fd_status init_dknet_bridge(){
 
 static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, food_pos_t* ctx ){
 	int i,j;
+	double ctx_conf;
 	for(i = 0; i < num; ++i){
 		char labelstr[4096] = {0};
 		int class = -1;
@@ -45,6 +50,7 @@ static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, f
 					strcat(labelstr, ", ");
 					strcat(labelstr, names[j]);
 				}
+				ctx_conf = dets[i].prob[j];
 #if dbgl1
 				printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
 #endif
@@ -58,6 +64,20 @@ static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, f
 			int right = (b.x+b.w/2.)*DKNET_INPUT_W;
 			int top   = (b.y-b.h/2.)*DKNET_INPUT_H;
 			int bot   = (b.y+b.h/2.)*DKNET_INPUT_H;
+			
+			left = IMAX(left, 5);
+			left = IMIN(left, DKNET_INPUT_H - 5);
+			
+			right = IMAX(right, 5);
+			right = IMIN(right, DKNET_INPUT_H - 5);
+
+			top = IMAX(top, 5);
+			top = IMIN(top, DKNET_INPUT_H - 5);
+
+			bot= IMAX(bot, 5);
+			bot = IMIN(bot, DKNET_INPUT_H - 5);
+
+
 #if dbgl1
 			printf("bounding box: %s: %d, %d, %d, %d\n", labelstr, left, right, top, bot);            
 #endif
@@ -72,10 +92,12 @@ static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, f
 				ctx->pos_topright.x = bot;
 				ctx->pos_topright.y =right;
 
-				ctx->pos_bottomleft.x = left;
-				ctx->pos_bottomleft.y = top;
+				ctx->pos_bottomleft.x = top;
+				ctx->pos_bottomleft.y = left;
 
-				strcpy(ctx->food_name, labelstr); 
+				strcpy(ctx->food_name, labelstr);
+				printf("assigning confidence : %lf\n", ctx_conf);
+				ctx->__confidence = ctx_conf; 
 				return fd_ok;
 			}
 			else {

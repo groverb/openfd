@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+            <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+            <!--Import materialize.css-->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+            <!-- Compiled and minified JavaScript -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+                    
+    </head>
+<body>
+
+
+
+<div class="container">
+        <h1 class="center-align">
+            Open FD Web Portal
+        </h1>
+        <div class="center-align">
+                <div class="input-field col s6">
+                        <input id="url" type="text" class="validate">
+                        <label for="url">Enter Url</label>
+                </div>
+                <button class="btn waves-effect waves-light" onclick="submitForm()"  >Submit
+                        <i class="material-icons right">send</i>
+                </button>
+            </div>
+        <br>
+        <div class="row">
+                <div class="col s6">
+                        <h4>Input Image</h4>
+                    <img id="ctx_image" width="416" height="416" src="./resized.bmp" alt="input Image">
+                </div>
+                
+                <div class="col s6">
+                        <h4>JSON Output</h4>
+                        <pre>
+                            <code id="jsonOutput">
+                                    
+                            </code>
+                        </pre>
+                </div>
+        </div>
+        
+</div>
+
+
+<script>
+
+/*
+<div class="col s4">
+                        <canvas id="myCanvas" width="300" height="300" style="border:1px solid #d3d3d3;">
+                            </canvas>
+                </div>
+</div>
+        <div class="row">
+
+*/
+function submitForm(){
+   	const ctx_form = new FormData();
+		ctx_form.append("url", document.getElementById("url").value);
+// 	document.getElementById("ctx_image").src = "./resized.bmp"
+     fetch("http://127.0.0.1:5000/evaluate/", {
+            method: 'POST',
+            headers: {
+              //'Accept': 'application/json',
+              //'Content-Type': 'application/json',
+             //  'mode': 'no cors'
+            },
+            body: ctx_form// JSON.stringify({"url": document.getElementById("url").value}),
+    })
+    .then(
+        response => response.json()
+            .then(
+                data => 
+                //fetching json will call createRect
+                {
+                   			console.log("received json");
+												console.log(data);
+                        document.getElementById("jsonOutput").textContent = JSON.stringify(data, undefined, 4);
+                        var c = document.getElementById("ctx_image");
+												var rand = Math.floor(Math.random() * 10000);
+												
+												c.src = "./final.bmp?"+rand;
+                       	// location.reload(); 
+												/*
+                        var ctx = c.getContext("2d");
+												var img = document.getElementById("scream");
+                        ctx.drawImage(img, 10, 10);
+                        
+                        console.log(c);
+                        ctx.beginPath();
+
+                        //this code creates the rectangle
+                        ctx.rect(100,200,200, 200)
+                        ctx.rect(20, 20, 150, 100);
+
+
+                        ctx.strokeStyle = "red";
+                        ctx.lineWidth = 4;
+                        ctx.stroke();
+                    */
+										//createRect(data);
+                }
+                
+    ));
+}  
+
+// window.onload =  function(){
+//   var c = document.getElementById("myCanvas");
+//   var ctx = c.getContext("2d");
+//   var img = document.getElementById("scream");
+//   ctx.drawImage(img, 200, 200);
+  
+//   ctx.beginPath();
+
+//   //this code creates the rectangle
+//   ctx.rect(100,200,200, 200)
+//   ctx.rect(20, 20, 150, 100);
+
+
+//   ctx.strokeStyle = "red";
+//   ctx.lineWidth = 4;
+//   ctx.stroke();
+  
+// }
+
+
+</script>
+
+
+</body>
+</html>
