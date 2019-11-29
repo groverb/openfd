@@ -49,7 +49,7 @@ typedef struct _food_pos_t{
 
 typedef struct _fd_result_t{
 	int frame_id;
-	double timestamp;
+	unsigned long timestamp;
 	int num_fooditems;
 	food_pos_t fooditems[80];
 } fd_result_t;

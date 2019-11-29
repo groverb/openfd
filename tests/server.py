@@ -34,7 +34,7 @@ FD_CONFIG_T._fields_ = ("indims", INT2), ("format", c_int), ("docpath", c_char_p
 FOOD_POS_T._fields_ = ("food_name", c_char * 100), ("pos_topright", INT2), ("pos_bottomleft", INT2), ("projected_food_pos", INT2), ("__confidence", c_double)
 
 
-FD_RESULT_T._fields_ = ("frame_id", c_int), ("timestamp", c_double), ("num_fooditems", c_int), ("fooditems", FOOD_POS_T * 80)
+FD_RESULT_T._fields_ = ("frame_id", c_int), ("timestamp", c_ulong), ("num_fooditems", c_int), ("fooditems", FOOD_POS_T * 80)
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin 

@@ -97,8 +97,11 @@ fd_status prepare_result(fdlist* evaluations, fd_result_t* res){
 
 			for(int i =0;i<res->num_fooditems; i++){
 				memcpy(&(res->fooditems[i]), (food_pos_t*)(cur->val), sizeof(food_pos_t));
+				strcpy(res->fooditems[i].food_name, ((food_pos_t*)(cur->val))->food_name);
 				if(cur->next != NULL) { cur = cur->next; }
 			}
+
+			res->timestamp = (unsigned long) time(NULL);
 		}
 		return fd_ok;
 	}
