@@ -17,6 +17,9 @@ static PyObject* pmain_func = NULL, *pinit_func = NULL;
 static PyObject* pargs = NULL;
 static PyObject* pvalue = NULL;
 
+/* 
+ * converts buffer array to python list
+ */
 static PyObject* atopfdlist(uint8_t* buff, size_t buff_len){
 	PyObject* ret_fdlist = PyList_New((int)buff_len);
 	if(ret_fdlist == NULL){ printf("couldnt make fdlist\n"); exit(-1); }
@@ -26,6 +29,9 @@ static PyObject* atopfdlist(uint8_t* buff, size_t buff_len){
 	return ret_fdlist;
 }
 
+/*
+ * Initializes python subsystem
+ */
 fd_status init_py_bridge(const char* docpath){
 
 	// setenv("PYTHONPATH", _g_python_path ,1);
@@ -61,7 +67,10 @@ fd_status init_py_bridge(const char* docpath){
 
 }
 
-
+/* 
+ * core eval function for python evaluation. Calls
+ * py_eval() in __eval__.py
+ */
 void _py_eval(uint8_t* buff, size_t buff_len, ret_tup* ctx){
 
 	// Py_Initialize();

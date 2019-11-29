@@ -42,7 +42,9 @@ pixel pixel_avg(pixel pa, pixel pb){
 	return ret;
 }
 
-
+/*
+ * empty image constructor
+ */ 
 fdimage* make_fdimage(__int2 fdimagedims){
 	fdimage* ret = malloc(sizeof(fdimage));
 	ret->data = malloc( fdimagedims.x * fdimagedims.y * sizeof(pixel*));
@@ -160,6 +162,12 @@ float* normalize_buffer(uint8_t* buff, size_t len){
 	return ret;
 }
 
+
+/* 
+ * basically does a transpose of the buffer.
+ * this needs to be done because darknet accesses 
+ * the buffer in a different order
+ */
 float* to_dknet_buffer(uint8_t* buff, size_t len){
 
 	int w = DKNET_INPUT_W, h = DKNET_INPUT_H, c = 3;
@@ -176,7 +184,6 @@ float* to_dknet_buffer(uint8_t* buff, size_t len){
 			}
 		}
 	}
-
 
 	return ret;
 }
@@ -205,7 +212,7 @@ void __dknetbuffer_to_fdimage(float* buffer, __int2 indims){
 
 
 	uint8_t* im_buff = malloc(sizeof(uint8_t) * indims.x * indims.y * 3);
-	
+
 	if(im_buff){
 		int i,k, l;
 		for(k = 0; k < 3; ++k){

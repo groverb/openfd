@@ -8,10 +8,15 @@
 #include "fdlist.h"
 
 
-static int get_fc(fdimage* ctx, __int2 windims){
+static inline int get_fc(fdimage* ctx, __int2 windims){
 	return (1 + (ctx->dims.x - windims.x) * (1 + (ctx->dims.y - windims.y)));
 }
 
+/* 
+ * Provided the buffer offset, generaes 
+ * a frame of size SW_WINDIMS_H * SW_WINDIMS_W
+ * gets called in a loop from sw_get_frames()
+ */
 static fdimage* create_window(fdimage* ctx, __int2 windims, __int2 offset){
 
 	__int2 end = {offset.x + SW_WINDIMS_X, offset.y + SW_WINDIMS_Y};
@@ -42,7 +47,10 @@ static fdimage* create_window(fdimage* ctx, __int2 windims, __int2 offset){
 	return ret;
 }
 
-
+/* 
+ * core function to produce frames from an 
+ * image based on sliding window algorithm
+ */
 fdlist* sw_get_frames(fdimage* ctx, __int2 windims, int step){
 	fdlist* ret = make_fdlist();
 

@@ -13,11 +13,21 @@
 #include "darknet.h"
 #include "dknet_bridge.h"
 
+/* 
+ * _g_config: holds input parameters
+ * _g_categories_lut: category lookup table
+ * _waitq: wait queue to hold un-evaluated images
+ * _doneq: done queue to hold results from evaluated images
+ */
 fd_config_t* _g_config = NULL;
 char _g_categories_lut[NN_CATEGORY_COUNT][30];
 static fdlist* _waitq = NULL;
 static fdlist* _doneq = NULL;
 
+
+/*
+ * load categories for food101 dataset
+ */
 #if PYTHON_EVAL
 static fd_status load_categories(){
 	FILE* catf;
@@ -38,6 +48,13 @@ static fd_status load_categories(){
 static inline void load_categories() {}
 #endif
 
+
+/*
+ * Initializes wait queue and done queue 
+ * for async funcitonality. Copies passed
+ * config onto global config var.
+ * Initializes relevant eval subsystem(py/darknet)
+ */
 fd_status fd_init(fd_config_t config){
 	_waitq = make_fdlist();
 	_doneq = make_fdlist();
@@ -61,12 +78,20 @@ fd_status fd_init(fd_config_t config){
 #endif
 }
 
+
+/*
+ * Used to re-configure the input parameters
+ */
 fd_status fd_configure_input(fd_config_t config){
 	memcpy(_g_config, &config, sizeof(fd_config_t));
 	return fd_ok;
 }
 
-fd_status fd_submit_fdimage_buffer(int frameid, void* buffer){
+/*
+ * Appends submitted image buffer to wait queue.
+ * Used for async eval
+ */
+fd_status fd_submit_image(int frameid, void* buffer){
 
 	if(buffer == NULL){ return fd_invalidargs; }
 	if(_waitq == NULL){ return fd_notinitialized; }
@@ -81,6 +106,11 @@ fd_status fd_submit_fdimage_buffer(int frameid, void* buffer){
 
 }
 
+
+/* 
+ * Returns the result of last evaluated image.
+ * Used right after fd_submit_image()
+ */ 
 fd_status fd_get_last_result(fd_result_t* result){
 
 	if(result == NULL){ return fd_invalidargs; }
@@ -96,21 +126,18 @@ fd_status fd_get_last_result(fd_result_t* result){
 
 }
 
+/* 
+ * Used for synchronous eval
+ * NOTE: Frame ID is not relevant in this method's context
+ */ 
 fd_status fd_get_result_sync(int frameid, void* buffer, fd_result_t* result){
 	return exec_eval_pipeline((uint8_t*) buffer, result);
 }
 
 /*
-fd_status __fd_get_result_sync( char* fname, fd_result_t* res){
-	food_pos_t* ret = dknet_get_food_pos(fname);
-	if(ret != NULL){
-		memcpy(&(ret[0]), ret, sizeof(food_pos_t));
-		return fd_ok;
-	}
-	return fd_nullptr;
-}
-*/
-
+ * Free's wait queue, done queue, global config var 
+ * and the relevant eval subsystem 
+ */
 fd_status fd_shutdown(){
 #ifdef PYTHON_EVAL
 	assert(free_py_bridge() == fd_ok);

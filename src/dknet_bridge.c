@@ -13,7 +13,9 @@ static network* _net = NULL;
 static char** names;
 
 
-
+/* 
+ * initialized darknet subsystem
+ */
 fd_status init_dknet_bridge(){
 
 	char cfgfile[300], weightsfile[300], namesfile[300], datacfg[300];
@@ -34,7 +36,9 @@ fd_status init_dknet_bridge(){
 	return fd_ok;
 }
 
-
+/* 
+ * parses results from libdarknet into food_pos_t
+ */
 static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, food_pos_t* ctx ){
 	int i,j;
 	double ctx_conf;
@@ -109,8 +113,10 @@ static fd_status dknet_prepare_food_pos(detection* dets, int classes, int num, f
 }
 
 
-// input: 416 * 416 normalized buffer
-
+/*
+ * calls libdarknet's predict function 
+ * input: 416 * 416 normalized buffer
+ */
 fd_status dknet_eval(float* buffer, food_pos_t* foodpos){
 
 	layer l = _net->layers[_net->n-1];

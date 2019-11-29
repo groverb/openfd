@@ -11,6 +11,11 @@
 #include "slidingwin.h"
 #include "dknet_bridge.h"
 
+/* god function that covers:
+ * - sliding window
+ * - evaluation
+ * - prepare_result
+ */
 fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 	fdimage* ctx = buffer_to_fdimage((uint8_t*) buffer, _g_config->indims);
 	fdimage_write(ctx, "eval_inp.bmp");
@@ -74,6 +79,11 @@ fd_status exec_eval_pipeline(uint8_t* buffer, fd_result_t* result){
 	return fd_nullptr;
 }
 
+
+/* 
+ * parses evaluations results into 
+ * fd_result_t to be returned by the library 
+ */
 fd_status prepare_result(fdlist* evaluations, fd_result_t* res){
 	if(evaluations != NULL && res != NULL){
 
@@ -95,6 +105,11 @@ fd_status prepare_result(fdlist* evaluations, fd_result_t* res){
 	return fd_nullptr;
 }
 
+
+/* 
+ * Calls on the relevant evaluation
+ * subsystem(py eval/darknet)
+ */
 food_pos_t* eval(fdimage* ctx){
 	food_pos_t* ret = NULL; 
 	if(ctx != NULL){	
