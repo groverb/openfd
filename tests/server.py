@@ -3,8 +3,8 @@
 from ctypes import *
 # from pybufftest import *
 
-lib_file = "/home/bhavaygrover/Desktop/fd/openfd/libopenfd.so"
-
+# lib_file = "/home/bhavaygrover/Desktop/fd/openfd/libopenfd.so"
+lib_file = "/Users/bhavaygrover/Desktop/mainopenfd/fresh/openfd/tests/libopenfd.so" 
 
 openfd = CDLL(lib_file)
 
@@ -113,7 +113,7 @@ def run_openfd(url):
 		frameid = 0
 		# res = FD_RESULT_T()
 		global _g_res
-		openfd.fd_get_result_sync(c_int(frameid), buffptr, addressof(_g_res))
+		openfd.fd_get_result_sync(c_int(frameid), buffptr, byref(_g_res))
 		print("received num food items: ")
 		print(_g_res.num_fooditems)
 		jsonout = fd_make_json(_g_res)

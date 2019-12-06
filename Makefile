@@ -14,8 +14,8 @@ INCLUDEDIR = $(HOME)/include/
 3RDPARTYDIR=$(HOME)/src/3rdparty
 
 AR=ar rcs
-INCLUDEFLAGS= -I$(INCLUDEDIR) -I$(SRCDIR) -I$(3RDPARTYDIR)/darknet/include/  -I$(3RDPARTYDIR)/qdbmp -I/usr/include/python3.6/
-LDSEARCHFLAGS = -L$(HOME)/ -L$(3RDPARTYDIR)/darknet/ -L$(3RDPARTYDIR)/qdbmp/ 
+INCLUDEFLAGS= -I$(INCLUDEDIR) -I$(SRCDIR) -I$(3RDPARTYDIR)/darknet/include/  -I$(3RDPARTYDIR)/qdbmp -I/usr/include/python3.6/ -I/Library/Frameworks/Python.framework/Versions/3.6/include/python3.6m/
+LDSEARCHFLAGS = -L$(HOME)/ -L$(3RDPARTYDIR)/darknet/ -L$(3RDPARTYDIR)/qdbmp/ -L/Library/Frameworks/Python.framework/Versions/3.6/lib/  
 LDFLAGS= -lqdbmp -ldarknet -lpython3.6m
 LDRPATHFLAGS = -Wl,-rpath -Wl,$(HOME) -Wl,-rpath -Wl,$(3RDPARTYDIR)/darknet  -Wl,-rpath -Wl,$(3RDPARTYDIR)/qdbmp/
 
