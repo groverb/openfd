@@ -84,6 +84,7 @@ fd_status fd_init(fd_config_t config){
  */
 fd_status fd_configure_input(fd_config_t config){
 	memcpy(_g_config, &config, sizeof(fd_config_t));
+	strcpy(_g_config->docpath, config.docpath);
 	return fd_ok;
 }
 
